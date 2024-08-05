@@ -10,12 +10,8 @@ Route::get('/', function () {
 
 require __DIR__ . '/auth.php';
 
-
 Route::prefix('/api')->middleware('auth')->group(function () {
     Route::post('/workspace', [WorkspaceController::class, 'store']);
     Route::patch('/workspace/{workspaceId}', [WorkspaceController::class, 'update']);
     Route::delete('/workspace/{workspaceId}', [WorkspaceController::class, 'destroy']);
 });
-
-
-Route::get('/csrf', CSRFController::class);
