@@ -8,17 +8,17 @@ use Illuminate\Support\Str;
 describe('validate workspace form request', function () {
     it('should not create a workspace when the required fields are missing.', function () {
         $user = User::factory()->create();
-        $response = $this->actingAs($user)->postJson("/api/workspace", []);
+        $response = $this->actingAs($user)->postJson("/api/workspaces", []);
 
         $response->assertStatus(422);
-        $response->assertJsonValidationErrors(['name', 'subdomain', 'user_id']);
+        $response->assertJsonValidationErrors(['name', 'subdomain']);
     });
 
     it('should not create a workspace when subdomain is more than 255 characters', function () {
         $user = User::factory()->create();
 
         $response = $this->actingAs($user)
-            ->postJson("/api/workspace", [
+            ->postJson("/api/workspaces", [
                 "user_id" => $user->id,
                 "name" => fake()->name(),
                 "subdomain" => Str::repeat("test", 75)
@@ -33,7 +33,7 @@ describe('validate workspace form request', function () {
         $workspace = Workspace::factory()->create([
             'user_id' => $user->id
         ]);
-        $response = $this->actingAs($user)->patchJson("/api/workspace/{$workspace->id}", []);
+        $response = $this->actingAs($user)->patchJson("/api/workspaces/{$workspace->id}", []);
 
         $response->assertStatus(422);
         $response->assertJsonValidationErrors(['name', 'subdomain']);
@@ -51,11 +51,30 @@ describe('validate workspace form request', function () {
             "subdomain" => Str::repeat("test", 75)
         ];
 
-        $response = $this->actingAs($user)->patchJson("/api/workspace/{$workspace->id}", $params);
+        $response = $this->actingAs($user)->patchJson("/api/workspaces/{$workspace->id}", $params);
 
         $response->assertStatus(422);
         $response->assertJsonValidationErrors(['subdomain']);
     });
+});
+
+it('should return the same number of workspaces created for the user.', function() {
+    $user = User::factory()->create([
+        'name' => 'Test User',
+        'email' => 'test@example.com',
+    ]);
+
+    $workspaces = Workspace::factory(10)->create([
+        'user_id' => $user->id
+    ]);
+
+    $user->workspaces()->attach($workspaces);
+
+    $response = $this->actingAs($user)->getJson("/api/workspaces");
+    $data = $response->decodeResponseJson()['data'];
+
+    $response->assertStatus(200);
+    expect(count($data))->toBe(10);
 });
 
 
@@ -69,7 +88,7 @@ it('should create a workspace when the request data is valid.', function () {
     ];
 
     $response = $this->actingAs($user)
-        ->postJson("/api/workspace", $params);
+        ->postJson("/api/workspaces", $params);
 
     $response->assertStatus(200);
     $response->assertJsonFragment($params);
@@ -88,7 +107,7 @@ it('should not update on non existing workspace.', function () {
 
 
     $response = $this->actingAs($user)
-        ->patchJson("/api/workspace/1000", $params);
+        ->patchJson("/api/workspaces/1000", $params);
 
 
     $response->assertStatus(404);
@@ -108,7 +127,7 @@ it('should update a workspace when the request data is valid.', function () {
     ];
 
     $response = $this->actingAs($user)
-        ->patchJson("/api/workspace/{$workspace->id}", $params);
+        ->patchJson("/api/workspaces/{$workspace->id}", $params);
 
 
     $response->assertStatus(200);
@@ -123,7 +142,7 @@ it('should update a workspace when the request data is valid.', function () {
 it('should fail when deleting a workspace with non existing workspace id.', function () {
     $user = User::factory()->create();
 
-    $response = $this->actingAs($user)->deleteJson("/api/workspace/1111");
+    $response = $this->actingAs($user)->deleteJson("/api/workspaces/1111");
 
     $response->assertStatus(404);
     $response->assertJson(["message" => "Record not found."]);
@@ -137,7 +156,7 @@ it('should delete a workspace given a valid workspace id.', function () {
 
     expect($newUser->workspaces_count)->toBe(1);
 
-    $response = $this->actingAs($user)->deleteJson("/api/workspace/$workspace->id");
+    $response = $this->actingAs($user)->deleteJson("/api/workspaces/$workspace->id");
 
 
     $newUser = User::find($user->id)->withCount('workspaces')->get()->first();

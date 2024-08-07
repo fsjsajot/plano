@@ -12,16 +12,27 @@ use Symfony\Component\Translation\Exception\NotFoundResourceException;
 
 class WorkspaceController extends Controller
 {
+    public function index() {
+        $authUser = Auth::user();
+        $workspaces = Workspace::where('user_id', $authUser->id)->orderBy('created_at', 'asc')->get();
+
+        return response()->json(["data" => $workspaces]);
+    }
+
+    public function show(Workspace $workspace) {
+        return response()->json(["data" => $workspace]);
+    }
+
     /**
      * Store a newly created resource in storage.
      */
     public function store(StoreWorkspaceRequest $request)
     {
         $authUser = Auth::user();
-
         $user = User::find($authUser->id);
-
-        $workspace = $user->workspaces()->create($request->validated());
+        $params = $request->validated();
+        $params['user_id'] = $user->id;
+        $workspace = $user->workspaces()->create($params);
 
         return response()->json(["data" => $workspace]);
     }

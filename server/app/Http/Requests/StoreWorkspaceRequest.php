@@ -23,8 +23,7 @@ class StoreWorkspaceRequest extends FormRequest
     {
         return [
             'name' => ['required'],
-            'subdomain' => ['required', 'min:1', 'max:255'],
-            'user_id' => ['required']
+            'subdomain' => ['required', 'min:1', 'max:255']
         ];
     }
 }
