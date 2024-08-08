@@ -4,6 +4,8 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsToMany;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class Workspace extends Model
 {
@@ -15,7 +17,11 @@ class Workspace extends Model
         'user_id'
     ];
 
-    public function members() {
+    public function members() : BelongsToMany {
         return $this->belongsToMany(User::class)->withTimestamps();
+    }
+
+    public function statuses() : HasMany {
+        return $this->hasMany(Status::class);
     }
 }
