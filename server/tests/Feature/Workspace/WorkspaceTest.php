@@ -166,4 +166,10 @@ it('should delete a workspace given a valid workspace id.', function () {
     $response->assertJson(["data" => [
         "message" => $workspace->name . " has been deleted successfully."
     ]]);
+
+
+    $response = $this->actingAs($user)->getJson("/api/workspaces/$workspace->id");
+
+    $response->assertStatus(404);
+    $response->assertJson(["message" => "Record not found."]);
 });
