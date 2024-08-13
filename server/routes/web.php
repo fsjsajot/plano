@@ -9,8 +9,3 @@ Route::get('/', function () {
 });
 
 require __DIR__ . '/auth.php';
-
-Route::prefix('/api')->middleware('auth')->group(function () {
-    Route::apiResource('workspaces', WorkspaceController::class);
-    Route::apiResource('workspaces.statuses', StatusController::class);
-});
