@@ -72,7 +72,7 @@ it('should not delete a non existing status', function() {
     $response = $this->actingAs($user)->deleteJson("/api/workspaces/$workspace->id/statuses/0000111");
 
     $response->assertStatus(404);
-    $response->assertJson(["message" => "Record not found."]);
+    $response->assertJson(['data' => ['message' => 'Record not found.']]);
 });
 
 it('should delete a valid status', function() {
