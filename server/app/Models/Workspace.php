@@ -24,4 +24,8 @@ class Workspace extends Model
     public function statuses() : HasMany {
         return $this->hasMany(Status::class);
     }
+
+    public function boards() : HasMany {
+        return $this->hasMany(Board::class);
+    }
 }
