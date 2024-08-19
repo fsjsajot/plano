@@ -111,7 +111,7 @@ it('should not update on non existing workspace.', function () {
 
 
     $response->assertStatus(404);
-    $response->assertJson(['data' => ['message' => 'Record not found.']]);
+    $response->assertJson(['data' => ['message' => 'Resource not found.']]);
 });
 
 it('should update a workspace when the request data is valid.', function () {
@@ -145,7 +145,7 @@ it('should fail when deleting a workspace with non existing workspace id.', func
     $response = $this->actingAs($user)->deleteJson("/api/workspaces/1111");
 
     $response->assertStatus(404);
-    $response->assertJson(['data' => ['message' => 'Record not found.']]);
+    $response->assertJson(['data' => ['message' => 'Resource not found.']]);
 });
 
 it('should delete a workspace given a valid workspace id.', function () {
@@ -171,5 +171,5 @@ it('should delete a workspace given a valid workspace id.', function () {
     $response = $this->actingAs($user)->getJson("/api/workspaces/$workspace->id");
 
     $response->assertStatus(404);
-    $response->assertJson(['data' => ['message' => 'Record not found.']]);
+    $response->assertJson(['data' => ['message' => 'Resource not found.']]);
 });
