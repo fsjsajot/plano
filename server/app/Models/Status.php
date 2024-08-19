@@ -18,4 +18,8 @@ class Status extends Model
     public function workspace() : BelongsTo {
         return $this->belongsTo(Workspace::class);
     }
+
+    public function boardItem() : BelongsTo {
+        return $this->belongsTo(BoardItem::class);
+    }
 }
