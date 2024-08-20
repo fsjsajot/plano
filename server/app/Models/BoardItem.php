@@ -25,4 +25,8 @@ class BoardItem extends Model
     public function board() : BelongsTo {
         return $this->belongsTo(Board::class);
     }
+
+    public function itemVotes(): HasMany {
+        return $this->hasMany(ItemVote::class);
+    }
 }
