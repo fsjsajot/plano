@@ -18,7 +18,7 @@ class BoardItemFactory extends Factory
     {
         return [
             'title' => fake()->text(120),
-            'description' => fake()->realText(500)
+            'description' => fake()->sentence(20)
         ];
     }
 }
