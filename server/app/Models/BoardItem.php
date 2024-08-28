@@ -14,19 +14,36 @@ class BoardItem extends Model
 
     protected $fillable = ['title', 'description', 'status_id', 'board_id'];
 
-    public function status() : HasOne {
+    public function status(): HasOne
+    {
         return $this->hasOne(Status::class);
     }
 
-    public function files() : HasMany {
+    public function files(): HasMany
+    {
         return $this->hasMany(BoardItemFile::class);
     }
 
-    public function board() : BelongsTo {
+    public function board(): BelongsTo
+    {
         return $this->belongsTo(Board::class);
     }
 
-    public function itemVotes(): HasMany {
+    public function itemVotes(): HasMany
+    {
         return $this->hasMany(ItemVote::class);
+    }
+
+    public function comments(): HasMany
+    {
+        return $this->hasMany(ItemComment::class);
+    }
+
+    public function commentsWithReplies()
+    {
+        return $this->setRelation(
+            'comments',
+            ItemComment::treeOf(fn($query) => $query->isRoot()->where('board_item_id', $this->id))->get()->toTree()
+        );
     }
 }
