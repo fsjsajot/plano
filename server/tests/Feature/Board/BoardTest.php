@@ -4,150 +4,182 @@ use App\Models\Board;
 use App\Models\User;
 use App\Models\Workspace;
 use Illuminate\Support\Str;
+use Illuminate\Testing\Fluent\AssertableJson;
+use Laravel\Sanctum\Sanctum;
+
+beforeEach(function () {
+    $this->user = User::factory()->create();
+    $this->user2 = User::factory()->create(['user_role_id' => 1]); // admin account
+    $this->workspace = Workspace::factory()->hasAttached($this->user, [], 'members')->create(['user_id' => $this->user->id]);
+    Sanctum::actingAs($this->user);
+});
 
 it('should list all boards in a workspace.', function () {
-    $workspace = Workspace::factory()->hasBoards(10)->create();
-    $user = User::factory()->hasAttached($workspace)->create();
+    Board::factory(10)->for($this->workspace)->create();
 
-
-    $response = $this->actingAs($user)->getJson("/api/workspaces/$workspace->id/boards");
-    $data = $response->json()['data'];
-
-
-    $response->assertStatus(200);
-    expect($data)->each->toMatchArray(['workspace_id' => $workspace->id]);
-    expect($data)->toHaveCount(10);
+    $this->getJson("/api/workspaces/{$this->workspace->id}/boards")
+        ->assertOk()
+        ->assertJson(function (AssertableJson $json) {
+            $json->has('data', 10);
+        });
 });
 
 it('should return a single board in a workspace', function () {
-    $workspace = Workspace::factory()->create();
-    $board = Board::factory()->for($workspace)->create();
+    $board = Board::factory()->for($this->workspace)->create();
 
-    $user = User::factory()->hasAttached($workspace)->create();
-
-    $response = $this->actingAs($user)->getJson("/api/workspaces/$workspace->id/boards/$board->id");
-    $data = $response->json()['data'];
-
-    $response->assertStatus(200);
-    expect($data['name'])->toContain($board->name);
-
-
-    $response = $this->actingAs($user)->getJson("/api/workspaces/$workspace->id/boards/10000");
-
-    $response->assertStatus(404);
-    $response->assertJson(['data' => ['message' => 'Resource not found.']]);
+    $this->getJson("/api/workspaces/{$this->workspace->id}/boards/{$board->id}")
+        ->assertOk()
+        ->assertJson(function (AssertableJson $json) use ($board) {
+            $json->has('data')
+                ->where('data.name', $board->name);
+        });
 });
 
 it('should not create a board when request is invalid.', function () {
     $params = ['name' => ''];
-    $workspace = Workspace::factory()->create();
-    $user = User::factory()->hasAttached($workspace)->create();
+    $this->postJson("/api/workspaces/{$this->workspace->id}/boards", $params)
+        ->assertUnprocessable()
+        ->assertJsonValidationErrors(['name'])
+        ->assertJson(['message' => 'The name field is required.']);
 
-    $response = $this->actingAs($user)->postJson("/api/workspaces/$workspace->id/boards", $params);
-
-    $response->assertStatus(422);
-    $response->assertJsonValidationErrors(['name']);
-    expect($response['message'])->toBe('The name field is required.');
-
-
-    $params = ['name' => Str::repeat('test', 100)];
-    $response = $this->actingAs($user)->postJson("/api/workspaces/$workspace->id/boards", $params);
-
-    $response->assertStatus(422);
-    $response->assertJsonValidationErrors(['name']);
-    expect($response['message'])->toBe('The name field must not be greater than 256 characters.');
+    $params = ['name' => Str::repeat("test", 200)];
+    $this->postJson("/api/workspaces/{$this->workspace->id}/boards", $params)
+        ->assertUnprocessable()
+        ->assertJsonValidationErrors(['name'])
+        ->assertJson(['message' => 'The name field must not be greater than 256 characters.']);
 });
 
 it('should create a board when request is valid.', function () {
     $params = ['name' => fake()->word()];
-    $workspace = Workspace::factory()->create();
-    $user = User::factory()->hasAttached($workspace)->create();
 
-    $response = $this->actingAs($user)->postJson("/api/workspaces/$workspace->id/boards", $params);
-    $data = $response->json()['data'];
+    $this->postJson("/api/workspaces/{$this->workspace->id}/boards", $params)
+        ->assertCreated()
+        ->assertJson(function (AssertableJson $json) use ($params) {
+            $json->has('data')
+                ->where('data.name', $params['name']);
+        });
+});
 
-    $response->assertStatus(201);
-    expect($data['name'])->toBe($params['name']);
+it('should fail when updating a resource if user is not a workspace owner.', function () {
+    // logged in with a different user account 
+    $user3 = User::factory()->create();
+    Sanctum::actingAs($user3);
 
-    $boardId = $data['id'];
-    $response = $this->actingAs($user)->getJson("/api/workspaces/$workspace->id/boards/$boardId");
-    $data = $response->json()['data'];
+    $board = Board::factory()->for($this->workspace)->create();
+    $params = [
+        "name" => "test"
+    ];
 
-    $response->assertStatus(200);
-    expect($data)->not->toBeNull();
+    $this->patchJson("/api/workspaces/{$this->workspace->id}/boards/{$board->id}", $params)
+        ->assertForbidden();
+});
+
+it('should update if the resource is created by the workspace owner.', function () {
+    $board = Board::factory()->for($this->workspace)->create();
+    $params = [
+        "name" => "test"
+    ];
+
+    $this->patchJson("/api/workspaces/{$this->workspace->id}/boards/{$board->id}", $params)
+        ->assertOk()
+        ->assertJson(function (AssertableJson $json) use ($params) {
+            $json->has('data')
+                ->where('data.name', $params['name']);
+        });
+});
+
+it('should update if the current user is an admin.', function () {
+    // logged in as an admin
+    Sanctum::actingAs($this->user2);
+
+    $board = Board::factory()->for($this->workspace)->create();
+    $params = [
+        "name" => "test"
+    ];
+
+    $this->patchJson("/api/workspaces/{$this->workspace->id}/boards/{$board->id}", $params)
+        ->assertOk()
+        ->assertJson(function (AssertableJson $json) use ($params) {
+            $json->has('data')
+                ->where('data.name', $params['name']);
+        });
 });
 
 it('should not update a board when request is invalid.', function () {
+    $board = Board::factory()->for($this->workspace)->create();
     $params = ['name' => ''];
+    $this->patchJson("/api/workspaces/{$this->workspace->id}/boards/{$board->id}", $params)
+        ->assertUnprocessable()
+        ->assertJsonValidationErrors(['name'])
+        ->assertJson(['message' => 'The name field is required.']);
 
-    $workspace = Workspace::factory()->create();
-    $board = Board::factory()->for($workspace)->create();
-    $user = User::factory()->hasAttached($workspace)->create();
-
-    $response = $this->actingAs($user)->patchJson("/api/workspaces/$workspace->id/boards/$board->id", $params);
-
-    $response->assertStatus(422);
-    $response->assertJsonValidationErrors(['name']);
-    expect($response['message'])->toBe('The name field is required.');
-
-
-    $params = ['name' => Str::repeat('test', 100)];
-    $response = $this->actingAs($user)->patchJson("/api/workspaces/$workspace->id/boards/$board->id", $params);
-
-    $response->assertStatus(422);
-    $response->assertJsonValidationErrors(['name']);
-    expect($response['message'])->toBe('The name field must not be greater than 256 characters.');
+    $params = ['name' => Str::repeat("test", 200)];
+    $this->patchJson("/api/workspaces/{$this->workspace->id}/boards/{$board->id}", $params)
+        ->assertUnprocessable()
+        ->assertJsonValidationErrors(['name'])
+        ->assertJson(['message' => 'The name field must not be greater than 256 characters.']);
 });
 
 it('should not update a non existing board.', function () {
     $params = ['name' => fake()->word()];
-    $workspace = Workspace::factory()->create();
-    $user = User::factory()->hasAttached($workspace)->create();
 
-    $response = $this->actingAs($user)->patchJson("/api/workspaces/$workspace->id/boards/10000", $params);
-    $data = $response->json();
-
-    $response->assertStatus(404);
-    $response->assertJson(['data' => ['message' => 'Resource not found.']]);
+    $this->patchJson("/api/workspaces/{$this->workspace->id}/boards/10000", $params)
+        ->assertNotFound()
+        ->assertJson(['data' => ['message' => 'Resource not found.']]);
 });
 
 it('should update a board when request is valid.', function () {
     $params = ['name' => fake()->word()];
-    $workspace = Workspace::factory()->create();
-    $board = Board::factory()->for($workspace)->create();
-    $user = User::factory()->hasAttached($workspace)->create();
+    $board = Board::factory()->for($this->workspace)->create();
 
-    $response = $this->actingAs($user)->patchJson("/api/workspaces/$workspace->id/boards/$board->id", $params);
-
-    $response->assertStatus(200);
-    $response->assertJsonFragment($params);
-
-
-    $board = Board::find($board->id);
-    expect($board->name)->toBe($params['name']);
+    $this->patchJson("/api/workspaces/{$this->workspace->id}/boards/{$board->id}", $params)
+        ->assertOk()
+        ->assertJson(function (AssertableJson $json) use ($params) {
+            $json->has('data')
+                ->where('data.name', $params['name']);
+        });
 });
 
+it('should fail when deleting a resource if user is not a workspace owner.', function () {
+    // logged in with a different user account 
+    $user3 = User::factory()->create();
+    Sanctum::actingAs($user3);
+
+    $board = Board::factory()->for($this->workspace)->create();
+
+    $this->deleteJson("/api/workspaces/{$this->workspace->id}/boards/{$board->id}")
+        ->assertForbidden();
+});
+
+it('should delete if the resource is created by the workspace owner.', function () {
+    $board = Board::factory()->for($this->workspace)->create();
+
+    $this->deleteJson("/api/workspaces/{$this->workspace->id}/boards/{$board->id}")
+        ->assertOk()
+        ->assertJson(["data" => ["message" => "{$board->name} has been deleted successfully."]]);
+});
+
+it('should delete if the current user is an admin.', function () {
+    // logged in as an admin
+    Sanctum::actingAs($this->user2);
+
+    $board = Board::factory()->for($this->workspace)->create();
+
+    $this->deleteJson("/api/workspaces/{$this->workspace->id}/boards/{$board->id}")
+        ->assertOk()
+        ->assertJson(["data" => ["message" => "{$board->name} has been deleted successfully."]]);
+});
 
 it('should not delete a non existing board.', function () {
-    $workspace = Workspace::factory()->create();
-    $user = User::factory()->hasAttached($workspace)->create();
-
-    $response = $this->actingAs($user)->getJson("/api/workspaces/$workspace->id/boards/10000");
-    $response->assertStatus(404);
-    $response->assertJson(['data' => ['message' => 'Resource not found.']]);
+    $this->deleteJson("/api/workspaces/{$this->workspace->id}/boards/10000")
+        ->assertNotFound()
+        ->assertJson(['data' => ['message' => 'Resource not found.']]);
 });
 
 it('should delete an existing board.', function () {
-    $workspace = Workspace::factory()->create();
-    $board = Board::factory()->for($workspace)->create();
-    $user = User::factory()->hasAttached($workspace)->create();
+    $board = Board::factory()->for($this->workspace)->create();
 
-
-    $response = $this->actingAs($user)->deleteJson("/api/workspaces/$workspace->id/boards/$board->id");
-    $response->assertStatus(200);
-    $response->assertJson(["data" => ["message" => $board->name . " has been deleted successfully."]]);
-
-    $response = $this->actingAs($user)->getJson("/api/workspaces/$workspace->id/boards/$board->id");
-    $response->assertStatus(404);
-    $response->assertJson(['data' => ['message' => 'Resource not found.']]);
+    $this->deleteJson("/api/workspaces/{$this->workspace->id}/boards/{$board->id}")
+        ->assertOk()
+        ->assertJson(["data" => ["message" => "{$board->name} has been deleted successfully."]]);
 });

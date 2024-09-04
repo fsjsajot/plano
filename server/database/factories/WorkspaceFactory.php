@@ -21,7 +21,6 @@ class WorkspaceFactory extends Factory
         return [
             'name' => fake()->company(),
             'subdomain' =>  Str::lower(fake()->colorName()) . "-" . Str::lower(fake()->word()),
-            'user_id' => User::factory()
         ];
     }
 }

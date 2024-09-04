@@ -5,20 +5,23 @@ use App\Models\BoardItem;
 use App\Models\ItemComment;
 use App\Models\Status;
 use App\Models\User;
+use App\Models\UserRole;
 use App\Models\Workspace;
+use Database\Seeders\UserRoleSeeder;
+use Illuminate\Support\Facades\App;
 use Illuminate\Testing\Fluent\AssertableJson;
 use Laravel\Sanctum\Sanctum;
 
 beforeEach(function () {
-    $this->user = User::factory()->create();
+    $this->user = User::factory()->create(); // workspace admin account
     $this->user2 = User::factory()->create();
     $this->user3 = User::factory()->create();
-    $this->user4 = User::factory()->create();
+    $this->user4 = User::factory()->create(['user_role_id' => 1]); // admin account
     $this->workspace = Workspace::factory()->create(['user_id' => $this->user->id]);
     $this->status = Status::factory()->create(['workspace_id' => $this->workspace->id]);
     $this->board = Board::factory()->for($this->workspace)->create();
     $this->user->workspaces()->attach($this->workspace);
-    $this->item = BoardItem::factory()->for($this->board)->create(['status_id' => $this->status->id]);
+    $this->item = BoardItem::factory()->for($this->board)->for($this->user)->create(['status_id' => $this->status->id]);
 
     Sanctum::actingAs($this->user);
 });
@@ -144,6 +147,98 @@ it('should not delete a non existing item comment.', function () {
 
 it('should delete a board item.', function () {
     $comment = ItemComment::factory()->for($this->item)->create(['user_id' => $this->user->id]);
+
+    $this->deleteJson("/api/workspaces/{$this->workspace->id}/boards/{$this->board->id}/items/{$this->item->id}/comments/{$comment->id}")
+        ->assertOk()
+        ->assertJson(['data' => ['message' => "Comment has been deleted successfully."]]);
+});
+
+// authorization test
+it('should fail when updating a resource if user does not created it.', function () {
+    // logged in with a different user account 
+    Sanctum::actingAs($this->user2);
+
+    $comment = ItemComment::factory()->for($this->item)->create(['user_id' => $this->user->id]);
+    $params = ["comment" => "test comment"];
+
+    $this->patchJson("/api/workspaces/{$this->workspace->id}/boards/{$this->board->id}/items/{$this->item->id}/comments/{$comment->id}", $params)
+        ->assertForbidden();
+});
+
+it('should update if the resource is created by the current user.', function () {
+    $comment = ItemComment::factory()->for($this->item)->create(['user_id' => $this->user->id]);
+    $params = ["comment" => "test comment"];
+
+    $this->patchJson("/api/workspaces/{$this->workspace->id}/boards/{$this->board->id}/items/{$this->item->id}/comments/{$comment->id}", $params)
+        ->assertOk()
+        ->assertJson(function (AssertableJson $json) use ($params) {
+            $json->has('data')
+                ->where('data.comment', "test comment");
+        });
+});
+
+it('should update if the current user is a workspace owner.', function () {
+    $comment = ItemComment::factory()->for($this->item)->create(['user_id' => $this->user2->id]);
+    $params = ["comment" => "test comment"];
+
+    $this->patchJson("/api/workspaces/{$this->workspace->id}/boards/{$this->board->id}/items/{$this->item->id}/comments/{$comment->id}", $params)
+        ->assertOk()
+        ->assertJson(function (AssertableJson $json) use ($params) {
+            $json->has('data')
+                ->where('data.comment', "test comment");
+        });
+});
+
+it('should update if the current user is an admin.', function () {
+    // logged in as an admin
+    Sanctum::actingAs($this->user4);
+
+    $comment = ItemComment::factory()->for($this->item)->create(['user_id' => $this->user3->id]);
+    $params = ["comment" => "test comment"];
+
+    $this->patchJson("/api/workspaces/{$this->workspace->id}/boards/{$this->board->id}/items/{$this->item->id}/comments/{$comment->id}", $params)
+        ->assertOk()
+        ->assertJson(function (AssertableJson $json) use ($params) {
+            $json->has('data')
+                ->where('data.comment', "test comment");
+        });
+});
+
+
+it('should fail when deleting a resource if the current user does not created it.', function () {
+    // logged in with different user account
+    Sanctum::actingAs($this->user3);
+    
+    $comment = ItemComment::factory()->for($this->item)->create(['user_id' => $this->user2->id]);
+
+    $this->deleteJson("/api/workspaces/{$this->workspace->id}/boards/{$this->board->id}/items/{$this->item->id}/comments/{$comment->id}")
+        ->assertForbidden();
+});
+
+it('should delete if the resource is created by the current user.', function () {
+    // logged in with different user account
+    Sanctum::actingAs($this->user2);
+
+    $comment = ItemComment::factory()->for($this->item)->create(['user_id' => $this->user2->id]);
+
+    $this->deleteJson("/api/workspaces/{$this->workspace->id}/boards/{$this->board->id}/items/{$this->item->id}/comments/{$comment->id}")
+        ->assertOk()
+        ->assertJson(['data' => ['message' => "Comment has been deleted successfully."]]);
+});
+
+it('should delete if the current user is a workspace owner.', function () {
+    $comment = ItemComment::factory()->for($this->item)->create(['user_id' => $this->user2->id]);
+
+    $this->deleteJson("/api/workspaces/{$this->workspace->id}/boards/{$this->board->id}/items/{$this->item->id}/comments/{$comment->id}")
+        ->assertOk()
+        ->assertJson(['data' => ['message' => "Comment has been deleted successfully."]]);
+});
+
+it('should delete if the current user is an admin.', function () {
+    // logged in as an admin
+    Sanctum::actingAs($this->user4);
+
+    $comment = ItemComment::factory()->for($this->item)->create(['user_id' => $this->user2->id]);
 
     $this->deleteJson("/api/workspaces/{$this->workspace->id}/boards/{$this->board->id}/items/{$this->item->id}/comments/{$comment->id}")
         ->assertOk()

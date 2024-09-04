@@ -3,7 +3,6 @@
 namespace Database\Seeders;
 
 use App\Models\User;
-use App\Models\Workspace;
 // use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\Hash;
@@ -15,21 +14,14 @@ class DatabaseSeeder extends Seeder
      */
     public function run(): void
     {
-        // User::factory(10)->create();
+        $this->call([
+            UserRoleSeeder::class
+        ]);
 
-        User::factory()
-            ->hasAttached(Workspace::factory()->count(10))->create();
-
-        $user = User::factory()->create([
+        User::factory()->create([
             'name' => 'Test User',
-            'email' => 'test@example.com',
+            'email' => 'demo@example.com',
             'password' => Hash::make('password')
         ]);
-
-        $workspaces = Workspace::factory(10)->create([
-            'user_id' => $user->id
-        ]);
-
-        $user->workspaces()->attach($workspaces);
     }
 }
