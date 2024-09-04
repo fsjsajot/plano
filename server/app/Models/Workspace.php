@@ -18,7 +18,7 @@ class Workspace extends Model
     ];
 
     public function members() : BelongsToMany {
-        return $this->belongsToMany(User::class)->withTimestamps();
+        return $this->belongsToMany(User::class, 'user_workspaces', 'workspace_id', 'user_id')->withTimestamps();
     }
 
     public function statuses() : HasMany {

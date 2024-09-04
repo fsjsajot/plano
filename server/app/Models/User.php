@@ -4,6 +4,7 @@ namespace App\Models;
 
 // use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
@@ -34,6 +35,10 @@ class User extends Authenticatable
         'remember_token',
     ];
 
+    protected $attributes = [
+        'user_role_id' => 2
+    ];
+
     /**
      * Get the attributes that should be cast.
      *
@@ -48,10 +53,18 @@ class User extends Authenticatable
     }
 
     public function workspaces() {
-        return $this->belongsToMany(Workspace::class);
+        return $this->belongsToMany(Workspace::class, 'user_workspaces', 'user_id', 'workspace_id');
     }
 
     public function itemVotes() : HasMany {
         return $this->hasMany(ItemVote::class);
     }
-}
+
+    public function userRole() : BelongsTo {
+        return $this->belongsTo(UserRole::class);
+    }
+
+    public function boardItems() : HasMany {
+        return $this->hasMany(BoardItem::class);
+    }
+ }
