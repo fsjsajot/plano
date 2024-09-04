@@ -3,8 +3,6 @@
 namespace App\Http\Controllers;
 
 use App\Models\Board;
-use App\Http\Requests\StoreBoardRequest;
-use App\Http\Requests\UpdateBoardRequest;
 use App\Models\Workspace;
 use Illuminate\Http\Request;
 
@@ -47,6 +45,10 @@ class BoardController extends Controller
      */
     public function update(Workspace $workspace, Request $request, Board $board)
     {
+        if ($request->user()->cannot('update', $workspace)) {
+            abort(403);
+        }
+
         $validatedData = $request->validate([
             'name' => ['required', 'string', 'min:0', 'max:256']
         ]);
@@ -61,10 +63,14 @@ class BoardController extends Controller
     /**
      * Remove the specified resource from storage.
      */
-    public function destroy(Workspace $workspace, Board $board)
+    public function destroy(Workspace $workspace, Board $board, Request $request)
     {
+        if ($request->user()->cannot('delete', $workspace)) {
+            abort(403);
+        }
+
         $board->delete();
 
-        return response()->json(["data" => ["message" => $board->name . " has been deleted successfully."]]);
+        return response()->json(["data" => ["message" => "{$board->name} has been deleted successfully."]]);
     }
 }

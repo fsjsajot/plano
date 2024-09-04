@@ -6,6 +6,7 @@ use App\Models\Board;
 use App\Models\BoardItem;
 use App\Models\Workspace;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 
 class BoardItemController extends Controller
 {
@@ -29,9 +30,10 @@ class BoardItemController extends Controller
             'status_id' => ['required']
         ]);
 
-        $validatedData['board_id'] = $board->id;
+        $validatedData['user_id'] = Auth::user()->id;
 
         $item = $board->boardItems()->create($validatedData);
+
         return response()->json(['data' => $item], 201);
     }
 
@@ -48,6 +50,10 @@ class BoardItemController extends Controller
      */
     public function update(Workspace $workspace, Board $board, Request $request, BoardItem $item)
     {
+        if ($request->user()->cannot('update', [$item, $workspace])) {
+            abort(403);
+        }
+
         $validatedData = $request->validate([
             'title' => ['required', 'string'],
             'description' => ['nullable'],
@@ -66,11 +72,14 @@ class BoardItemController extends Controller
     /**
      * Remove the specified resource from storage.
      */
-    public function destroy(Workspace $workspace, Board $board, BoardItem $item)
+    public function destroy(Workspace $workspace, Board $board, BoardItem $item, Request $request)
     {
+        if ($request->user()->cannot('delete', [$item, $workspace])) {
+            abort(403);
+        }
+
         $item->delete();
 
-
-        return response()->json(["data" => ["message" => $item->title . " has been deleted successfully."]]);
+        return response()->json(["data" => ["message" => "{$item->title} has been deleted successfully."]]);
     }
 }

@@ -3,9 +3,8 @@
 namespace App\Http\Controllers;
 
 use App\Models\Status;
-use App\Http\Requests\StoreStatusRequest;
-use App\Http\Requests\UpdateStatusRequest;
 use App\Models\Workspace;
+use Illuminate\Http\Request;
 
 class StatusController extends Controller
 {
@@ -14,20 +13,21 @@ class StatusController extends Controller
      */
     public function index(Workspace $workspace)
     {
-       $statuses = $workspace->statuses()->get(); 
+        $statuses = $workspace->statuses()->get();
 
-       return response()->json(["data" => $statuses]);
+        return response()->json(["data" => $statuses]);
     }
 
     /**
      * Store a newly created resource in storage.
      */
-    public function store(Workspace $workspace, StoreStatusRequest $request)
+    public function store(Workspace $workspace, Request $request)
     {
-        $params = $request->validated();
-        $params['workspace_id'] =  $workspace->id;
-
-        $status = Status::create($params);
+        $params = $request->validate([
+            'name' => ['required', 'string', 'min:1', 'max:256']
+        ]);
+        
+        $status = $workspace->statuses()->create($params);
 
         return response()->json(["data" => $status], 201);
     }
@@ -43,9 +43,15 @@ class StatusController extends Controller
     /**
      * Update the specified resource in storage.
      */
-    public function update(UpdateStatusRequest $request, Workspace $workspace, Status $status)
+    public function update(Request $request, Workspace $workspace, Status $status)
     {
-        $params = $request->validated();
+        if ($request->user()->cannot('update', $workspace)) {
+            abort(403);
+        }
+
+        $params = $request->validate([
+            'name' => ['required', 'string', 'min:1', 'max:256']
+        ]);
 
         $status->name = $params['name'];
         $status->save();
@@ -56,10 +62,14 @@ class StatusController extends Controller
     /**
      * Remove the specified resource from storage.
      */
-    public function destroy(Workspace $workspace, Status $status)
+    public function destroy(Workspace $workspace, Status $status, Request $request)
     {
+        if ($request->user()->cannot('delete', $workspace)) {
+            abort(403);
+        }
+
         $status->delete();
 
-        return response()->json(["data" => ["message" => $status->name . " has been deleted successfully."]]);
+        return response()->json(["data" => ["message" => "{$status->name} has been deleted successfully."]]);
     }
 }

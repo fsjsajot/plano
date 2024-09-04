@@ -43,6 +43,10 @@ class ItemCommentController extends Controller
      */
     public function update(Workspace $workspace, Board $board, BoardItem $item, ItemComment $comment, Request $request)
     {
+        if ($request->user()->cannot('update', [$comment, $workspace])) {
+            abort(403);
+        }
+
         $validatedData = $request->validate(['comment' => ['required']]);
         $comment->comment = $validatedData['comment'];
         $comment->save();
@@ -53,8 +57,12 @@ class ItemCommentController extends Controller
     /**
      * Remove the specified resource from storage.
      */
-    public function destroy(Workspace $workspace, Board $board, BoardItem $item, ItemComment $comment)
+    public function destroy(Workspace $workspace, Board $board, BoardItem $item, ItemComment $comment, Request $request)
     {
+        if ($request->user()->cannot('delete', [$comment, $workspace])) {
+            abort(403);
+        }
+
         $comment->delete();
 
         return response()->json(["data" => ["message" => "Comment has been deleted successfully."]]);

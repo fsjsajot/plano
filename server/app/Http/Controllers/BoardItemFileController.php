@@ -10,7 +10,6 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 
-use function Pest\Laravel\json;
 
 class BoardItemFileController extends Controller
 {
@@ -23,8 +22,12 @@ class BoardItemFileController extends Controller
     /**
      * Store a newly created resource in storage.
      */
-    public function store(Workspace $workspace, Board $board, BoardItem $item, Request $request)
+    public function store(Request $request, Workspace $workspace, Board $board, BoardItem $item)
     {
+        if ($request->user()->cannot('create', [$item, $workspace])) {
+            abort(403);
+        }
+
         $request->validate([
             "files" => ['required', 'array'],
             "files.*" => ['file', 'image', 'max:10240']
@@ -55,8 +58,12 @@ class BoardItemFileController extends Controller
     /**
      * Remove the specified resource from storage.
      */
-    public function destroy(Workspace $workspace, Board $board, BoardItem $item, BoardItemFile $file)
+    public function destroy(Workspace $workspace, Board $board, BoardItem $item, BoardItemFile $file, Request $request)
     {
+        if ($request->user()->cannot('delete', [$item, $workspace])) {
+            abort(403);
+        }
+
         if (Storage::disk('public')->exists($file->path)) {
             $result = Storage::disk('public')->delete($file->path);
 
