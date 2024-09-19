@@ -2,6 +2,9 @@
 @tailwind components;
 @tailwind utilities;
 
+html, body, #root, .wrapper {
+  height:100%;
+}
 
 @layer base {
   :root {
@@ -66,5 +69,11 @@
   }
   body {
     @apply bg-background text-foreground;
+  }
+}
+
+@layer base {
+  html {
+    @apply font-sans
   }
 }
