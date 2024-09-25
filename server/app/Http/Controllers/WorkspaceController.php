@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Resources\WorkspaceResource;
 use App\Models\Workspace;
 use App\Http\Requests\StoreWorkspaceRequest;
 use App\Models\User;
@@ -15,12 +16,12 @@ class WorkspaceController extends Controller
         $authUser = Auth::user();
         $workspaces = Workspace::where('user_id', $authUser->id)->orderBy('created_at', 'asc')->get();
 
-        return response()->json(["data" => $workspaces]);
+        return WorkspaceResource::collection($workspaces);
     }
 
     public function show(Workspace $workspace)
     {
-        return response()->json(["data" => $workspace]);
+        return new WorkspaceResource($workspace);
     }
 
     /**
@@ -29,8 +30,7 @@ class WorkspaceController extends Controller
     public function store(Request $request)
     {
         $validatedData = $request->validate([
-            'name' => ['required'],
-            'subdomain' => ['required', 'min:1', 'max:255']
+            'name' => ['required']
         ]);
 
         $user = Auth::user();
@@ -38,7 +38,7 @@ class WorkspaceController extends Controller
         $validatedData['user_id'] = $user->id;
         $workspace = $user->workspaces()->create($validatedData);
 
-        return response()->json(["data" => $workspace]);
+        return new WorkspaceResource($workspace);
     }
 
     /**
@@ -51,16 +51,14 @@ class WorkspaceController extends Controller
         }
 
         $params = $request->validate([
-            'name' => ['required'],
-            'subdomain' => ['required', 'min:1', 'max:255'],
+            'name' => ['required']
         ]);
 
         $workspace->name = $params["name"];
-        $workspace->subdomain = $params["subdomain"];
 
         $workspace->save();
 
-        return response()->json(["data" => $workspace]);
+        return new WorkspaceResource($workspace);
     }
 
     /**

@@ -19,8 +19,7 @@ class WorkspaceFactory extends Factory
     public function definition(): array
     {
         return [
-            'name' => fake()->company(),
-            'subdomain' =>  Str::lower(fake()->colorName()) . "-" . Str::lower(fake()->word()),
+            'name' => fake()->company()
         ];
     }
 }

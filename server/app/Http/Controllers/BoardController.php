@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Resources\BoardResource;
 use App\Models\Board;
 use App\Models\Workspace;
 use Illuminate\Http\Request;
@@ -15,7 +16,7 @@ class BoardController extends Controller
     {
         $boards = $workspace->boards;
 
-        return response()->json(['data' => $boards]);
+        return BoardResource::collection($boards);
     }
 
     /**
@@ -29,7 +30,7 @@ class BoardController extends Controller
 
         $board = $workspace->boards()->create($validatedData);
 
-        return response()->json(['data' => $board], 201);
+        return new BoardResource($board);
     }
 
     /**
@@ -37,7 +38,7 @@ class BoardController extends Controller
      */
     public function show(Workspace $workspace, Board $board)
     {
-        return response()->json(['data' => $board]);
+        return new BoardResource($board);
     }
 
     /**
@@ -57,7 +58,7 @@ class BoardController extends Controller
 
         $board->save();
 
-        return response()->json(['data' => $board]);
+        return new BoardResource($board);
     }
 
     /**

@@ -6,15 +6,13 @@ use App\Http\Controllers\BoardItemFileController;
 use App\Http\Controllers\ItemCommentController;
 use App\Http\Controllers\ItemVoteController;
 use App\Http\Controllers\StatusController;
+use App\Http\Controllers\UserController;
 use App\Http\Controllers\WorkspaceController;
-use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
-Route::middleware(['auth:sanctum', 'verified'])->get('/user', function (Request $request) {
-    return $request->user();
-});
+Route::middleware(['auth:sanctum', 'verified'])->get('/user', [UserController::class, "show"])->name("current.user");
 
-Route::middleware(['auth:sanctum'])->group(function() {
+Route::middleware(['auth:sanctum'])->group(function () {
     Route::apiResource('workspaces', WorkspaceController::class);
     Route::apiResource('workspaces.statuses', StatusController::class);
     Route::apiResource('workspaces.boards', BoardController::class);

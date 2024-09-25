@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Resources\StatusResource;
 use App\Models\Status;
 use App\Models\Workspace;
 use Illuminate\Http\Request;
@@ -15,7 +16,7 @@ class StatusController extends Controller
     {
         $statuses = $workspace->statuses()->get();
 
-        return response()->json(["data" => $statuses]);
+        return StatusResource::collection($statuses);
     }
 
     /**
@@ -29,7 +30,7 @@ class StatusController extends Controller
         
         $status = $workspace->statuses()->create($params);
 
-        return response()->json(["data" => $status], 201);
+        return new StatusResource($status);
     }
 
     /**
@@ -37,7 +38,8 @@ class StatusController extends Controller
      */
     public function show(Workspace $workspace, Status $status)
     {
-        return response()->json(["data" => $status]);
+        return new StatusResource($status);
+
     }
 
     /**
@@ -56,7 +58,7 @@ class StatusController extends Controller
         $status->name = $params['name'];
         $status->save();
 
-        return response()->json(["data" => $status]);
+        return new StatusResource($status);
     }
 
     /**

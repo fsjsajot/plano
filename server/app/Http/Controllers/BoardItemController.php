@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Resources\BoardItemResource;
 use App\Models\Board;
 use App\Models\BoardItem;
 use App\Models\Workspace;
@@ -16,7 +17,7 @@ class BoardItemController extends Controller
     public function index(Workspace $workspace, Board $board)
     {
         $boardItems = $board->boardItems;
-        return response()->json(['data' => $boardItems]);
+        return BoardItemResource::collection($boardItems);
     }
 
     /**
@@ -34,7 +35,7 @@ class BoardItemController extends Controller
 
         $item = $board->boardItems()->create($validatedData);
 
-        return response()->json(['data' => $item], 201);
+        return new BoardItemResource($item);
     }
 
     /**
@@ -42,7 +43,7 @@ class BoardItemController extends Controller
      */
     public function show(Workspace $workspace, Board $board, BoardItem $item)
     {
-        return response()->json(['data' => $item]);
+        return new BoardItemResource($item);
     }
 
     /**
@@ -66,7 +67,7 @@ class BoardItemController extends Controller
 
         $item->save();
 
-        return response()->json(['data' => $item]);
+        return new BoardItemResource($item);
     }
 
     /**

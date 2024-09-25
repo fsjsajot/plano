@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Resources\ItemCommentResource;
 use App\Models\Board;
 use App\Models\BoardItem;
 use App\Models\ItemComment;
@@ -35,7 +36,7 @@ class ItemCommentController extends Controller
 
         $comment = $item->comments()->create($params);
 
-        return response()->json(["data" => $comment], 201);
+        return new ItemCommentResource($comment);
     }
 
     /**
@@ -51,7 +52,7 @@ class ItemCommentController extends Controller
         $comment->comment = $validatedData['comment'];
         $comment->save();
 
-        return response()->json(["data" => $comment]);
+        return new ItemCommentResource($comment);
     }
 
     /**

@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Resources\ItemVoteResource;
 use App\Models\Board;
 use App\Models\BoardItem;
 use App\Models\ItemVote;
@@ -21,7 +22,7 @@ class ItemVoteController extends Controller
             'board_item_id' => $item->id
         ]);
 
-        return response()->json(['data' => $itemVote], 201);
+        return new ItemVoteResource($itemVote);
     }
 
     /**

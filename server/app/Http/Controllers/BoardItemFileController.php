@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Resources\BoardItemFileResource;
 use App\Models\Board;
 use App\Models\BoardItem;
 use App\Models\BoardItemFile;
@@ -16,7 +17,7 @@ class BoardItemFileController extends Controller
     public function index(Workspace $workspace, Board $board, BoardItem $item)
     {
         $boardItemFiles = $item->files;
-        return response()->json(["data" => $boardItemFiles]);
+        return BoardItemFileResource::collection($boardItemFiles);
     }
 
     /**

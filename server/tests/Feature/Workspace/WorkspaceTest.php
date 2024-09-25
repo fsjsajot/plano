@@ -16,34 +16,13 @@ beforeEach(function () {
 it('should not create a workspace when the required fields are missing.', function () {
     $this->postJson("/api/workspaces", [])
         ->assertStatus(422)
-        ->assertJsonValidationErrors(['name', 'subdomain']);
-});
-
-it('should not create a workspace when subdomain is more than 255 characters', function () {
-    $this->postJson("/api/workspaces", [
-        "user_id" => $this->user->id,
-        "name" => fake()->name(),
-        "subdomain" => Str::repeat("test", 75)
-    ])->assertStatus(422)
-        ->assertJsonValidationErrors(['subdomain']);
+        ->assertJsonValidationErrors(['name']);
 });
 
 it('should not update a workspace when the required fields are missing.', function () {
     $this->patchJson("/api/workspaces/{$this->workspace->id}", [])
         ->assertStatus(422)
-        ->assertJsonValidationErrors(['name', 'subdomain']);
-});
-
-it('should not update a workspace when subdomain is more than 255 characters', function () {
-    $params = [
-        "user_id" => $this->user->id,
-        "name" => fake()->name(),
-        "subdomain" => Str::repeat("test", 75)
-    ];
-
-    $this->patchJson("/api/workspaces/{$this->workspace->id}", $params)
-        ->assertStatus(422)
-        ->assertJsonValidationErrors(['subdomain']);
+        ->assertJsonValidationErrors(['name']);
 });
 
 it('should return the same number of workspaces created for the user.', function () {
@@ -68,11 +47,10 @@ it('should create a workspace when the request data is valid.', function () {
     Sanctum::actingAs($user2);
 
     $this->postJson("/api/workspaces", $params)
-        ->assertOk()
+        ->assertCreated()
         ->assertJson(function (AssertableJson $json) use ($params) {
             $json->has('data')
-                ->where('data.name', $params['name'])
-                ->where('data.subdomain', $params['subdomain']);
+                ->where('data.name', $params['name']);
         });
 });
 
@@ -82,8 +60,7 @@ it('should fail when updating a resource if user does not created it.', function
     $workspace = Workspace::factory()->hasAttached($user3, [], 'members')->create(['user_id' => $user3->id]);
 
     $params = [
-        "name" => fake()->name(),
-        "subdomain" => "mytest"
+        "name" => fake()->name()
     ];
 
     $this->patchJson("/api/workspaces/{$workspace->id}", $params)
@@ -92,16 +69,14 @@ it('should fail when updating a resource if user does not created it.', function
 
 it('should update if the resource is created by the current user.', function () {
     $params = [
-        "name" => fake()->name(),
-        "subdomain" => "mytest"
+        "name" => fake()->name()
     ];
 
     $this->patchJson("/api/workspaces/{$this->workspace->id}", $params)
         ->assertOk()
         ->assertJson(function (AssertableJson $json) use ($params) {
             $json->has('data')
-                ->where('data.name', $params['name'])
-                ->where('data.subdomain', $params['subdomain']);
+                ->where('data.name', $params['name']);
         });
 });
 
@@ -110,23 +85,20 @@ it('should update if the current user is an admin.', function () {
     Sanctum::actingAs($this->user2);
 
     $params = [
-        "name" => fake()->name(),
-        "subdomain" => "mytest"
+        "name" => fake()->name()
     ];
 
     $this->patchJson("/api/workspaces/{$this->workspace->id}", $params)
         ->assertOk()
         ->assertJson(function (AssertableJson $json) use ($params) {
             $json->has('data')
-                ->where('data.name', $params['name'])
-                ->where('data.subdomain', $params['subdomain']);
+                ->where('data.name', $params['name']);
         });
 });
 
 it('should not update on non existing workspace.', function () {
     $params = [
         "name" => "test",
-        "subdomain" => "mytest"
     ];
 
     $this->patchJson("/api/workspaces/1000", $params)
@@ -137,15 +109,13 @@ it('should not update on non existing workspace.', function () {
 it('should update a workspace when the request data is valid.', function () {
     $params = [
         "name" => fake()->name(),
-        "subdomain" => "mytest"
     ];
 
     $this->patchJson("/api/workspaces/{$this->workspace->id}", $params)
         ->assertOk()
         ->assertJson(function (AssertableJson $json) use ($params) {
             $json->has('data')
-                ->where('data.name', $params['name'])
-                ->where('data.subdomain', $params['subdomain']);
+                ->where('data.name', $params['name']);
         });
 });
 
