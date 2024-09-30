@@ -13,19 +13,21 @@ class Workspace extends Model
 
     protected $fillable = [
         'name',
-        'subdomain',
         'user_id'
     ];
 
-    public function members() : BelongsToMany {
+    public function members(): BelongsToMany
+    {
         return $this->belongsToMany(User::class, 'user_workspaces', 'workspace_id', 'user_id')->withTimestamps();
     }
 
-    public function statuses() : HasMany {
+    public function statuses(): HasMany
+    {
         return $this->hasMany(Status::class);
     }
 
-    public function boards() : HasMany {
+    public function boards(): HasMany
+    {
         return $this->hasMany(Board::class);
     }
 }

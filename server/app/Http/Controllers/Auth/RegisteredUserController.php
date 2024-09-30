@@ -32,6 +32,12 @@ class RegisteredUserController extends Controller
             'password' => Hash::make($request->string('password')),
         ]);
 
+        // insert default workspace
+        $user->workspaces()->create([
+            'name' => 'My Workspace',
+            'user_id' => $user->id
+        ]);
+
         event(new Registered($user));
 
         Auth::login($user);
