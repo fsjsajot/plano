@@ -2,8 +2,8 @@
 @tailwind components;
 @tailwind utilities;
 
-html, body, #root, .wrapper {
-  height:100%;
+#root {
+  min-height: 100dvh;
 }
 
 @layer base {
