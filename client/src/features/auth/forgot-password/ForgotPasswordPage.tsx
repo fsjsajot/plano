@@ -15,7 +15,7 @@ import {
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { LoadingSpinner } from "@/components/ui/loading-spinner";
-import { useAuth } from "@/hooks/useAuth";
+import { useAuth } from "@/hooks/auth/useAuth";
 
 const formSchema = z.object({
   email: z.string().min(1).email(),
@@ -37,7 +37,7 @@ export default function ForgotPasswordPage() {
   };
 
   return (
-    <div className="flex items-center justify-center h-full w-96 mx-auto flex-col">
+    <div className="flex items-center justify-center w-96 mx-auto flex-col">
       <div className="text-left w-full mb-4">
         <h3 className={"font-semibold leading-normal tracking-tight"}>
           Reset your password

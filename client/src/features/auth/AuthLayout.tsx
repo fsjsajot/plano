@@ -1,7 +1,7 @@
 import { Button } from "@/components/ui/button";
 import { LoadingSpinner } from "@/components/ui/loading-spinner";
-import { useAuth } from "@/hooks/useAuth";
-import { useAuthUser } from "@/hooks/useAuthUser";
+import { useAuth } from "@/hooks/auth/useAuth";
+import { useAuthUser } from "@/hooks/auth/useAuthUser";
 import { Link, Navigate, Outlet, useLocation } from "react-router-dom";
 
 export default function AuthLayout() {
@@ -23,11 +23,11 @@ export default function AuthLayout() {
 
   if (data && !data.redirect) {
     console.log("to dashboard");
-    return <Navigate to="/dashboard" replace />;
+    return <Navigate to={`/workspaces`} replace />;
   }
 
   return (
-    <div className="flex flex-col w-full h-full gap-2">
+    <div className="flex flex-col w-full min-h-dvh gap-2">
       <header className="sticky top-0 flex h-14 items-center gap-4 border-b bg-background px-4 md:px-6">
         <nav className="flex-col gap-6 text-lg font-medium md:flex md:flex-row md:items-center md:gap-5 md:text-sm lg:gap-6">
           <Link
@@ -47,9 +47,9 @@ export default function AuthLayout() {
           </div>
         )}
       </header>
-      <section className="flex-1">
+      <main className="flex-1 flex">
         <Outlet />
-      </section>
+      </main>
     </div>
   );
 }

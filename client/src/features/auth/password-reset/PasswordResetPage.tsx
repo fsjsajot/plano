@@ -15,7 +15,7 @@ import {
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { LoadingSpinner } from "@/components/ui/loading-spinner";
-import { useAuth } from "@/hooks/useAuth";
+import { useAuth } from "@/hooks/auth/useAuth";
 import { Navigate, useParams, useSearchParams } from "react-router-dom";
 
 const formSchema = z
@@ -79,7 +79,7 @@ export default function PasswordResetPage() {
   console.log(`Current count: ${count}`);
 
   return (
-    <div className="flex items-center justify-center h-full w-96 mx-auto flex-col">
+    <div className="flex items-center justify-center w-96 mx-auto flex-col">
       <div className="text-left w-full mb-4">
         <h3 className={"font-semibold leading-normal tracking-tight"}>
           Set your new password
