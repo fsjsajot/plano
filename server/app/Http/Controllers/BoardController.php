@@ -25,7 +25,8 @@ class BoardController extends Controller
     public function store(Workspace $workspace, Request $request)
     {
         $validatedData = $request->validate([
-            'name' => ['required', 'string', 'min:0', 'max:256']
+            'name' => ['required', 'string', 'min:0', 'max:256'],
+            'description' => ['nullable']
         ]);
 
         $board = $workspace->boards()->create($validatedData);
@@ -50,11 +51,16 @@ class BoardController extends Controller
             abort(403);
         }
 
-        $validatedData = $request->validate([
-            'name' => ['required', 'string', 'min:0', 'max:256']
+        $request->validate([
+            'name' => ['required', 'string', 'min:0', 'max:256'],
+            'description' => ['nullable']
         ]);
 
-        $board->name = $validatedData['name'];
+        $board->name = $request->name;
+
+        if ($request->has('description')) {
+            $board->description = $request->description;
+        }
 
         $board->save();
 

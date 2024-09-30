@@ -17,6 +17,7 @@ class BoardResource extends JsonResource
         return [
             "id" => $this->id,
             "name" => $this->name,
+            "description" => $this->description,
             "workspace_id" => $this->workspace_id,
             "created_at" => $this->created_at,
             "updated_at" => $this->updated_at

@@ -11,7 +11,7 @@ class Board extends Model
 {
     use HasFactory;
 
-    protected $fillable = ['name', 'workspace_id'];
+    protected $fillable = ['name', 'description', 'workspace_id'];
 
     public function workspace(): BelongsTo
     {

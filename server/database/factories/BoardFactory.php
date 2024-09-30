@@ -19,6 +19,7 @@ class BoardFactory extends Factory
     {
         return [
             'name' => fake()->unique()->word(),
+            'description' => fake()->sentences(3, true),
             'workspace_id' => Workspace::factory()
         ];
     }

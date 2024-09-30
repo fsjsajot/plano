@@ -31,7 +31,8 @@ it('should return a single board in a workspace', function () {
         ->assertOk()
         ->assertJson(function (AssertableJson $json) use ($board) {
             $json->has('data')
-                ->where('data.name', $board->name);
+                ->where('data.name', $board->name)
+                ->where('data.description', $board->description);
         });
 });
 
@@ -50,13 +51,14 @@ it('should not create a board when request is invalid.', function () {
 });
 
 it('should create a board when request is valid.', function () {
-    $params = ['name' => fake()->word()];
+    $params = ['name' => fake()->word(), 'description' => fake()->sentence()];
 
     $this->postJson("/api/workspaces/{$this->workspace->id}/boards", $params)
         ->assertCreated()
         ->assertJson(function (AssertableJson $json) use ($params) {
             $json->has('data')
-                ->where('data.name', $params['name']);
+                ->where('data.name', $params['name'])
+                ->where('data.description', $params['description']);
         });
 });
 
@@ -129,14 +131,15 @@ it('should not update a non existing board.', function () {
 });
 
 it('should update a board when request is valid.', function () {
-    $params = ['name' => fake()->word()];
+    $params = ['name' => fake()->word(), 'description' => fake()->sentence()];
     $board = Board::factory()->for($this->workspace)->create();
 
     $this->patchJson("/api/workspaces/{$this->workspace->id}/boards/{$board->id}", $params)
         ->assertOk()
         ->assertJson(function (AssertableJson $json) use ($params) {
             $json->has('data')
-                ->where('data.name', $params['name']);
+                ->where('data.name', $params['name'])
+                ->where('data.description', $params['description']);
         });
 });
 
