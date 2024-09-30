@@ -67,7 +67,7 @@ it('should create a board item when request is valid.', function () {
         ->assertJson(function (AssertableJson $json) use ($params) {
             $json->has('data')
                 ->where('data.title', $params['title'])
-                ->where('data.status_id', $params['status_id']);
+                ->where('data.statusId', $params['status_id']);
         });
 });
 
@@ -174,7 +174,7 @@ it('should update a board item when request is valid.', function () {
             $json->has('data')
                 ->where('data.title', $params['title'])
                 ->where('data.description', $params['description'])
-                ->where('data.status_id', $params['status_id']);
+                ->where('data.statusId', $params['status_id']);
         });
 });
 

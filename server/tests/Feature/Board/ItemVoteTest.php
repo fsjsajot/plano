@@ -29,8 +29,8 @@ it('should create an item vote.', function () {
             fn(AssertableJson $json) =>
             $json->has('data')
                 ->where('data.id', 1)
-                ->where('data.user_id', $this->user->id)
-                ->where('data.board_item_id', $this->item->id)
+                ->where('data.userId', $this->user->id)
+                ->where('data.boardItemId', $this->item->id)
         );
 });
 

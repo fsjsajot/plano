@@ -96,8 +96,8 @@ it('should create a root item comment when request is valid.', function () {
         ->assertJson(function (AssertableJson $json) use ($params) {
             $json->has('data')
                 ->where('data.comment', $params['comment'])
-                ->where('data.author_id', $params['user_id'])
-                ->where('data.board_item_id', $params['board_item_id']);
+                ->where('data.authorId', $params['user_id'])
+                ->where('data.boardItemId', $params['board_item_id']);
         });
 });
 
@@ -111,9 +111,9 @@ it('should create a reply item comment on a root item comment when request is va
         ->assertJson(function (AssertableJson $json) use ($params) {
             $json->has('data')
                 ->where('data.comment', $params['comment'])
-                ->where('data.author_id', $params['user_id'])
-                ->where('data.parent_id', $params['parent_id'])
-                ->where('data.board_item_id', $params['board_item_id']);
+                ->where('data.authorId', $params['user_id'])
+                ->where('data.parentId', $params['parent_id'])
+                ->where('data.boardItemId', $params['board_item_id']);
         });
 });
 
