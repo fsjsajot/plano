@@ -1,17 +1,21 @@
-import { Navigate, RouteObject } from "react-router-dom";
+import { RouteObject } from "react-router-dom";
 import { authRoutes } from "./auth";
+import { appRoutes } from "./app";
+import RootPage from "@/features/RootPage";
 
 export const routes: RouteObject[] = [
   {
     id: "root",
+    path: "/",
     children: [
       {
-        path: "/",
+        path: "",
         index: true,
-        element: <Navigate to="/login" replace />,
+        element: <RootPage />,
       },
 
       authRoutes,
+      ...appRoutes,
     ],
   },
 ];
