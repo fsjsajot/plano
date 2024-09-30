@@ -8,3 +8,13 @@ export const http = axios.create({
   withCredentials: true,
   withXSRFToken: true,
 });
+
+http.interceptors.response.use((response) => {
+  const data = response.data;
+
+  if (Object.prototype.hasOwnProperty.call(data, "data")) {
+    return data;
+  }
+
+  return response;
+});
