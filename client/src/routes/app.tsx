@@ -2,7 +2,8 @@ import DashboardLayout from "@/features/app/dashboard/DashboardLayout";
 import UserWorkspacePage from "@/features/user/UserWorkspacePage";
 import { Navigate, RouteObject } from "react-router-dom";
 import { DashboardErrorBoundary } from "@/features/app/dashboard/DashboardErrorBoundary";
-import ManageBoards from "@/features/app/dashboard/Boards/ManageBoards";
+import ManageBoards from "@/features/app/dashboard/boards/ManageBoards";
+import ManageStatuses from "@/features/app/dashboard/statuses/manage-statuses";
 
 export const appRoutes: RouteObject[] = [
   {
@@ -26,7 +27,7 @@ export const appRoutes: RouteObject[] = [
       },
       {
         path: "statuses",
-        element: <div>Boards page</div>,
+        element: <ManageStatuses />,
       },
       {
         path: "members",
