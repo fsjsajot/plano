@@ -95,13 +95,14 @@ it('should not create a status on invalid data', function () {
 });
 
 it('should create a status on valid data', function () {
-    $params = ['name' => fake()->word()];
+    $params = ['name' => fake()->word(), 'position' => 1];
     $this->postJson("/api/workspaces/{$this->workspace->id}/statuses", $params)
         ->assertCreated()
         ->assertJson(function (AssertableJson $json) use ($params) {
             $json
                 ->has('data')
-                ->where('data.name', $params['name']);
+                ->where('data.name', $params['name'])
+                ->where('data.position', $params['position']);
         });
 });
 
@@ -128,13 +129,15 @@ it('should update a status on valid data', function () {
         'workspace_id' => $this->workspace->id
     ]);
 
-    $params = ['name' => fake()->word()];
+    $params = ['name' => fake()->word(), 'position' => 2, 'visibility' => true];
     $this->patchJson("/api/workspaces/{$this->workspace->id}/statuses/{$status->id}", $params)
         ->assertOk()
         ->assertJson(function (AssertableJson $json) use ($params) {
             $json
                 ->has('data')
-                ->where('data.name', $params['name']);
+                ->where('data.name', $params['name'])
+                ->where('data.position', $params['position'])
+                ->where('data.visibility', $params['visibility']);
         });
 });
 

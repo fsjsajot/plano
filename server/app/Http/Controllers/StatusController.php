@@ -27,7 +27,15 @@ class StatusController extends Controller
         $params = $request->validate([
             'name' => ['required', 'string', 'min:1', 'max:256']
         ]);
-        
+
+        if ($request->has('position')) {
+            $params['position'] = $request->position;
+        }
+
+        if ($request->has('visibility')) {
+            $params['visibility'] = $request->visibility;
+        }
+
         $status = $workspace->statuses()->create($params);
 
         return new StatusResource($status);
@@ -54,6 +62,15 @@ class StatusController extends Controller
         $params = $request->validate([
             'name' => ['required', 'string', 'min:1', 'max:256']
         ]);
+
+
+        if ($request->has('position')) {
+            $status->position = $request->position;
+        }
+
+        if ($request->has('visibility')) {
+            $status->visibility = $request->visibility;
+        }
 
         $status->name = $params['name'];
         $status->save();

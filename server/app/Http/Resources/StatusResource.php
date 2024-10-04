@@ -17,6 +17,8 @@ class StatusResource extends JsonResource
         return [
             "id" => $this->id,
             "name" => $this->name,
+            "position" => $this->position,
+            "visibility" => $this->visibility,
             "workspace_id" => $this->workspace_id,
             "created_at" => $this->created_at,
             "updated_at" => $this->updated_at

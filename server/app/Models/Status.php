@@ -12,14 +12,22 @@ class Status extends Model
 
     protected $fillable = [
         'name',
+        'position',
+        'visibility',
         'workspace_id',
     ];
 
-    public function workspace() : BelongsTo {
+    protected $casts = [
+        "position" => "float"
+    ];
+
+    public function workspace(): BelongsTo
+    {
         return $this->belongsTo(Workspace::class);
     }
 
-    public function boardItem() : BelongsTo {
+    public function boardItem(): BelongsTo
+    {
         return $this->belongsTo(BoardItem::class);
     }
 }
