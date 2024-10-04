@@ -61,7 +61,6 @@ export const BoardTable = <TData, TValue>({
           placeholder="Filter board names"
           value={(table.getColumn("name")?.getFilterValue() as string) ?? ""}
           onChange={(event) => {
-            console.log(table.getColumn("name")?.getFilterValue());
             table.getColumn("name")?.setFilterValue(event.target.value);
           }}
         />
