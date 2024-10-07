@@ -4,6 +4,7 @@ import { Navigate, RouteObject } from "react-router-dom";
 import { DashboardErrorBoundary } from "@/features/app/dashboard/DashboardErrorBoundary";
 import ManageBoards from "@/features/app/dashboard/boards/ManageBoards";
 import ManageStatuses from "@/features/app/dashboard/statuses/manage-statuses";
+import { ManageWorkspace } from "@/features/app/dashboard/manage-workspace";
 
 export const appRoutes: RouteObject[] = [
   {
@@ -35,7 +36,7 @@ export const appRoutes: RouteObject[] = [
       },
       {
         path: "settings",
-        element: <div>Boards page</div>,
+        element: <ManageWorkspace />,
       },
     ],
   },

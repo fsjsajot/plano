@@ -14,21 +14,31 @@ import { Workspace } from "@/types/entities";
 import { useForm } from "react-hook-form";
 import { Form } from "../ui/form";
 import { LoadingSpinner } from "../ui/loading-spinner";
+import { useNavigate } from "react-router-dom";
 
 export const DeleteWorkspaceDialog = ({
   open,
   onOpenChange,
   workspace,
+  redirect = false,
 }: {
   workspace: Workspace;
   open: boolean;
   onOpenChange: () => void;
+  redirect?: boolean;
 }) => {
   const { deleteWorkspace } = useWorkspaces();
   const form = useForm();
+  const navigate = useNavigate();
 
   const onSubmit = async () => {
-    await deleteWorkspace(workspace.id).then(() => onOpenChange());
+    await deleteWorkspace(workspace.id).then(() => {
+      onOpenChange();
+
+      if (redirect) {
+        navigate("/workspaces");
+      }
+    });
   };
 
   return (
@@ -43,9 +53,7 @@ export const DeleteWorkspaceDialog = ({
         <AlertDialogFooter>
           <AlertDialogCancel>Cancel</AlertDialogCancel>
           <Form {...form}>
-            <form
-              onSubmit={form.handleSubmit(onSubmit)}
-            >
+            <form onSubmit={form.handleSubmit(onSubmit)}>
               <Button
                 disabled={form.formState.isSubmitting}
                 variant="destructive"
