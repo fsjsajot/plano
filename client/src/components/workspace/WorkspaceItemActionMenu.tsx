@@ -39,7 +39,7 @@ export const WorkspaceItemActionMenu = ({
   return (
     <DropdownMenu>
       <DropdownMenuTrigger className="top-3 right-3 absolute">
-        <GearIcon className="w-6 h-6" />
+        <GearIcon className="w-6 h-6 hover:text-white" />
       </DropdownMenuTrigger>
       <DropdownMenuContent>
         <DropdownMenuItem onSelect={() => handleDialogOpen(MENU_ACTIONS.edit)}>
