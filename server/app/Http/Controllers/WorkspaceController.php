@@ -29,14 +29,19 @@ class WorkspaceController extends Controller
      */
     public function store(Request $request)
     {
-        $validatedData = $request->validate([
+        $params = $request->validate([
             'name' => ['required']
         ]);
 
         $user = Auth::user();
 
-        $validatedData['user_id'] = $user->id;
-        $workspace = $user->workspaces()->create($validatedData);
+        $params['user_id'] = $user->id;
+
+        if ($request->has('description')) {
+            $params['description'] = $request->description;
+        }
+
+        $workspace = $user->workspaces()->create($params);
 
         return new WorkspaceResource($workspace);
     }
@@ -55,7 +60,11 @@ class WorkspaceController extends Controller
         ]);
 
         $workspace->name = $params["name"];
-
+        
+        if ($request->has('description')) {
+            $workspace->description = $request->description;
+        }
+        
         $workspace->save();
 
         return new WorkspaceResource($workspace);

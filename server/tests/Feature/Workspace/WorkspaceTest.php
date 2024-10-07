@@ -42,7 +42,7 @@ it('should return the same number of workspaces created for the user.', function
 
 it('should create a workspace when the request data is valid.', function () {
     $user2 = User::factory()->create();
-    $params = Workspace::factory()->raw(['user_id' => $user2->id]);
+    $params = Workspace::factory()->raw(['user_id' => $user2->id, 'description' => 'my test description']);
 
     Sanctum::actingAs($user2);
 
@@ -50,7 +50,8 @@ it('should create a workspace when the request data is valid.', function () {
         ->assertCreated()
         ->assertJson(function (AssertableJson $json) use ($params) {
             $json->has('data')
-                ->where('data.name', $params['name']);
+                ->where('data.name', $params['name'])
+                ->where('data.description', $params['description']);
         });
 });
 
@@ -109,13 +110,15 @@ it('should not update on non existing workspace.', function () {
 it('should update a workspace when the request data is valid.', function () {
     $params = [
         "name" => fake()->name(),
+        "description" => 'updated description'
     ];
 
     $this->patchJson("/api/workspaces/{$this->workspace->id}", $params)
         ->assertOk()
         ->assertJson(function (AssertableJson $json) use ($params) {
             $json->has('data')
-                ->where('data.name', $params['name']);
+                ->where('data.name', $params['name'])
+                ->where('data.description', $params['description']);
         });
 });
 
