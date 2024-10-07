@@ -23,7 +23,11 @@ export const ManageWorkspace = ({}) => {
         <h3 className="text-xl font-medium leading-normal tracking-tight">
           {workspace?.name}
         </h3>
-        <p className="text-sm text-muted-foreground">Lorem ipsum dolor</p>
+        {workspace.description && (
+          <p className="text-sm text-muted-foreground">
+            {workspace.description}
+          </p>
+        )}
       </div>
 
       <div className="mx-8 space-y-8">

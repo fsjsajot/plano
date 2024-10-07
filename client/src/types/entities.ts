@@ -9,6 +9,7 @@ export interface User {
 export interface Workspace {
   id: string;
   name: string;
+  description: string;
   email: string;
   createdAt: string;
   updatedAt: string;

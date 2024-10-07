@@ -36,7 +36,7 @@ export const EditWorkspaceDetails = ({
     resolver: zodResolver(formSchema),
     defaultValues: {
       name: workspace.name,
-      description: "",
+      description: workspace.description || "",
     },
   });
 
@@ -100,7 +100,7 @@ export const EditWorkspaceDetails = ({
           />
 
           <div className="">
-            <Button disabled={form.formState.isSubmitting} type="submit">
+            <Button size="sm" disabled={form.formState.isSubmitting} type="submit">
               {form.formState.isSubmitting ? (
                 <span className="inline-flex items-center gap-1">
                   <LoadingSpinner />
