@@ -55,7 +55,7 @@ class User extends Authenticatable implements MustVerifyEmail
     }
 
     public function workspaces() {
-        return $this->belongsToMany(Workspace::class, 'user_workspaces', 'user_id', 'workspace_id');
+        return $this->belongsToMany(Workspace::class, 'user_workspaces', 'user_id', 'workspace_id')->withTimestamps();
     }
 
     public function itemVotes() : HasMany {
