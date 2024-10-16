@@ -41,6 +41,7 @@ export const useWorkspaces = () => {
   const { data, isLoading } = useQuery({
     queryKey: ["workspaces"],
     queryFn: fetchUserWorkspaces,
+    staleTime: Infinity
   });
 
   return {
