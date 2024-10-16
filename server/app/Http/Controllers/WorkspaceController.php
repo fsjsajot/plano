@@ -4,8 +4,6 @@ namespace App\Http\Controllers;
 
 use App\Http\Resources\WorkspaceResource;
 use App\Models\Workspace;
-use App\Http\Requests\StoreWorkspaceRequest;
-use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 
@@ -60,11 +58,11 @@ class WorkspaceController extends Controller
         ]);
 
         $workspace->name = $params["name"];
-        
+
         if ($request->has('description')) {
             $workspace->description = $request->description;
         }
-        
+
         $workspace->save();
 
         return new WorkspaceResource($workspace);
