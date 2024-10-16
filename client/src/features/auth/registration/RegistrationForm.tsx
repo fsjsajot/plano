@@ -2,6 +2,7 @@ import { useForm } from "react-hook-form";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { CircleNotch } from "@phosphor-icons/react";
+import { useNavigate, useSearchParams } from "react-router-dom";
 
 import { Button } from "@/components/ui/button";
 import {
@@ -26,7 +27,6 @@ const formSchema = z.object({
 
 export default function RegistrationForm() {
   const { register } = useAuth();
-
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
@@ -36,8 +36,18 @@ export default function RegistrationForm() {
     },
   });
 
+  const [searchParams] = useSearchParams();
+  const redirectTo = searchParams.get("redirect_to");
+  const navigate = useNavigate();
+
   const onSubmit = async (values: z.infer<typeof formSchema>) =>
-    await register(values);
+    await register(values).then(() => {
+      if (redirectTo) {
+        navigate(redirectTo, {
+          replace: true,
+        });
+      }
+    });
 
   return (
     <Form {...form}>

@@ -1,7 +1,10 @@
-import { Link } from "react-router-dom";
+import { Link, useSearchParams } from "react-router-dom";
 import LoginForm from "./LoginForm";
 
 export default function LoginPage() {
+  const [searchParams] = useSearchParams();
+  const redirectTo = searchParams.get("redirect_to");
+
   return (
     <div className="flex items-center justify-center w-96 mx-auto flex-col">
       <div className="text-left w-full mb-4">
@@ -19,7 +22,7 @@ export default function LoginPage() {
         <span>New to Plano?</span>
 
         <Link
-          to="/register"
+          to={redirectTo ? `/register?redirect_to=${redirectTo}` : "/register"}
           className="ml-1 text-blue-600 font-medium hover:text-blue-700"
         >
           Create account

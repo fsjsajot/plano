@@ -1,6 +1,7 @@
 import { useForm } from "react-hook-form";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
+import { Link, useNavigate, useSearchParams } from "react-router-dom";
 
 import { Button } from "@/components/ui/button";
 import {
@@ -12,7 +13,6 @@ import {
   FormMessage,
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
-import { Link } from "react-router-dom";
 import { useAuth } from "@/hooks/auth/useAuth";
 import { LoadingSpinner } from "@/components/ui/loading-spinner";
 
@@ -32,8 +32,18 @@ export default function LoginForm() {
     },
   });
 
+  const [searchParams] = useSearchParams();
+  const redirectTo = searchParams.get("redirect_to");
+  const navigate = useNavigate();
+
   const onSubmit = async (values: z.infer<typeof formSchema>) =>
-    await login(values);
+    await login(values).then(() => {
+      if (redirectTo) {
+        navigate(redirectTo, {
+          replace: true,
+        });
+      }
+    });
 
   return (
     <Form {...form}>
