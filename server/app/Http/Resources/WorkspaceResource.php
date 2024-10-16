@@ -20,7 +20,8 @@ class WorkspaceResource extends JsonResource
             "description" => $this->description,
             "owner_id" => $this->user_id,
             "created_at" => $this->created_at,
-            "updated_at" => $this->updated_at
+            "updated_at" => $this->updated_at,
+            "owner" => new UserResource($this->owner)
         ];
     }
 }
