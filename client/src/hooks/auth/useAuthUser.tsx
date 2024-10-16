@@ -5,9 +5,10 @@ import { http } from "@/lib/http";
 import { User } from "@/types/entities";
 import { useNavigate } from "react-router-dom";
 
-type CurrentUser = User & {redirect?: string}
+type CurrentUser = User & { redirect?: string };
 
 export const useAuthUser = () => {
+  const navigate = useNavigate();
   const getCurrentUser = async () => {
     try {
       const response = await http.get<CurrentUser>("/api/user");
@@ -20,7 +21,9 @@ export const useAuthUser = () => {
           return null;
         }
 
-        return {redirect: '/verify-email'};
+        return navigate("/verify-email", {
+          replace: true,
+        });
       }
     }
   };
@@ -28,6 +31,6 @@ export const useAuthUser = () => {
   return useQuery({
     queryKey: ["me"],
     queryFn: async () => getCurrentUser(),
-    staleTime: 120000,
+    staleTime: Infinity,
   });
 };
