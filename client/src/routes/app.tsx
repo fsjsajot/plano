@@ -6,6 +6,9 @@ import ManageBoards from "@/features/app/dashboard/boards/ManageBoards";
 import ManageStatuses from "@/features/app/dashboard/statuses/manage-statuses";
 import { ManageWorkspace } from "@/features/app/dashboard/manage-workspace";
 
+import { InvitedUserScreen } from "@/features/workspace-invite/components/invited-user-screen";
+import { ManageMembers } from "@/features/manage-members/components/manage-members";
+
 export const appRoutes: RouteObject[] = [
   {
     path: "/workspaces",
@@ -32,12 +35,18 @@ export const appRoutes: RouteObject[] = [
       },
       {
         path: "members",
-        element: <div>Boards page</div>,
+        element: <ManageMembers />,
       },
       {
         path: "settings",
         element: <ManageWorkspace />,
       },
     ],
+  },
+
+  {
+    path: "/workspaces/:workspaceId/invited/:token",
+    element: <InvitedUserScreen />,
+    errorElement: <DashboardErrorBoundary />,
   },
 ];
