@@ -13,6 +13,7 @@ export interface Workspace {
   email: string;
   createdAt: string;
   updatedAt: string;
+  owner: User;
 }
 
 export interface Board {
@@ -28,6 +29,18 @@ export interface Status {
   name: string;
   position: number;
   visibility: boolean;
+  createdAt: string;
+  updatedAt: string;
+}
+
+export interface WorkspaceInvite {
+  id: string;
+  email: string;
+  token: string;
+  inviteType: number;
+  workspace: Workspace;
+  inviteUrl: string;
+  disabledAt: string;
   createdAt: string;
   updatedAt: string;
 }
