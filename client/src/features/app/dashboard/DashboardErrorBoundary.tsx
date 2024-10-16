@@ -28,7 +28,7 @@ const DashboardNotFoundError = () => (
       </Link>
     </div>
     <div className="max-w-lg">
-      <img src="/404.png" />
+      <img fetchPriority="high" loading="eager" alt="404 error banner" src="/404.png" />
     </div>
   </DashboardErrorElement>
 );
@@ -76,5 +76,14 @@ export const DashboardErrorBoundary = () => {
     );
   }
 
-  return <div>Oops!</div>;
+  return (
+    <DashboardErrorElement>
+      <div className="text-center">
+        <h1 className="text-8xl font-extrabold text-red-500">Oops!</h1>
+        <p className="text-4xl font-medium text-gray-800 mt-8">
+          An unknown error occured!
+        </p>
+      </div>
+    </DashboardErrorElement>
+  );
 };
