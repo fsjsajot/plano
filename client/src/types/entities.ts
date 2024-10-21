@@ -4,20 +4,22 @@ export interface User {
   email: string;
   createdAt: string;
   updatedAt: string;
+  emailVerifiedAt: string;
 }
 
 export interface Workspace {
-  id: string;
+  id: number;
   name: string;
   description: string;
   email: string;
   createdAt: string;
   updatedAt: string;
   owner: User;
+  logoUrl: string;
 }
 
 export interface Board {
-  id: string;
+  id: number;
   name: string;
   description: string;
   createdAt: string;
@@ -25,7 +27,7 @@ export interface Board {
 }
 
 export interface Status {
-  id: string;
+  id: number;
   name: string;
   position: number;
   visibility: boolean;

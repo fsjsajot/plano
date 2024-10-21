@@ -1,20 +1,20 @@
 import { RouteObject } from "react-router-dom";
 import { authRoutes } from "./auth";
 import { appRoutes } from "./app";
-import RootPage from "@/features/RootPage";
 import { WorkspaceInvite } from "@/features/workspace-invite/components/workspace-invite";
-import { DashboardErrorBoundary } from "@/features/app/dashboard/DashboardErrorBoundary";
+import { AppErrorBoundary } from "@/components/app-error-boundary/app-error-boundary";
+import { RootLayout } from "@/components/layout/root-layout";
 
 export const routes: RouteObject[] = [
   {
     id: "root",
     path: "/",
-    errorElement: <DashboardErrorBoundary/>,
+    errorElement: <AppErrorBoundary/>,
     children: [
       {
         path: "",
         index: true,
-        element: <RootPage />,
+        element: <RootLayout />,
       },
 
       authRoutes,

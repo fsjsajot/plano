@@ -1,6 +1,6 @@
 import { Navigate, useParams } from "react-router-dom";
 
-import { useAuthUser } from "@/hooks/auth/useAuthUser";
+import { useAuthUser } from "@/features/auth/hooks/use-auth-user";
 import { useWorkspaceInvitedEmail } from "../api/get-workspace-invited-email";
 import { LoadingSpinner } from "@/components/ui/loading-spinner";
 

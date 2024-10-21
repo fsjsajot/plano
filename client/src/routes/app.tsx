@@ -1,25 +1,25 @@
-import DashboardLayout from "@/features/app/dashboard/DashboardLayout";
-import UserWorkspacePage from "@/features/user/UserWorkspacePage";
 import { Navigate, RouteObject } from "react-router-dom";
-import { DashboardErrorBoundary } from "@/features/app/dashboard/DashboardErrorBoundary";
-import ManageBoards from "@/features/app/dashboard/boards/ManageBoards";
-import ManageStatuses from "@/features/app/dashboard/statuses/manage-statuses";
-import { ManageWorkspace } from "@/features/app/dashboard/manage-workspace";
 
 import { InvitedUserScreen } from "@/features/workspace-invite/components/invited-user-screen";
 import { ManageMembers } from "@/features/manage-members/components/manage-members";
+import { ManageBoards } from "@/features/manage-boards/components/manage-boards";
+import { ManageStatuses } from "@/features/manage-statuses/components/manage-statuses";
+import UserWorkspacePage from "@/features/user-workspaces/components/user-workspaces";
+import { ManageWorkspace } from "@/features/manage-workspace/components/manage-workspace";
+import { AppErrorBoundary } from "@/components/app-error-boundary/app-error-boundary";
+import { DashboardLayout } from "@/components/layout/dashboard-layout";
 
 export const appRoutes: RouteObject[] = [
   {
     path: "/workspaces",
     element: <UserWorkspacePage />,
-    errorElement: <DashboardErrorBoundary />,
+    errorElement: <AppErrorBoundary />,
   },
 
   {
     path: "/workspaces/:workspaceId",
     element: <DashboardLayout />,
-    errorElement: <DashboardErrorBoundary />,
+    errorElement: <AppErrorBoundary />,
     children: [
       {
         path: "",
@@ -47,6 +47,6 @@ export const appRoutes: RouteObject[] = [
   {
     path: "/workspaces/:workspaceId/invited/:token",
     element: <InvitedUserScreen />,
-    errorElement: <DashboardErrorBoundary />,
+    errorElement: <AppErrorBoundary />,
   },
 ];

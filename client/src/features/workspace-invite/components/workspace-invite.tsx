@@ -2,7 +2,7 @@ import { Link, useLocation, useParams } from "react-router-dom";
 
 import { buttonVariants } from "@/components/ui/button";
 import { LoadingSpinner } from "@/components/ui/loading-spinner";
-import { useAuthUser } from "@/hooks/auth/useAuthUser";
+import { useAuthUser } from "@/features/auth/hooks/use-auth-user";
 import { AuthenticatedInviteScreen } from "./authenticated-invite-screen";
 import { useWorkspaceTokenInvite } from "../api/get-workspace-invite-token";
 

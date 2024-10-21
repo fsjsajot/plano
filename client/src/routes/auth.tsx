@@ -1,10 +1,11 @@
-import AuthLayout from "@/features/auth/AuthLayout";
-import ForgotPasswordPage from "@/features/auth/forgot-password/ForgotPasswordPage";
-import LoginPage from "@/features/auth/login/LoginPage";
-import PasswordResetPage from "@/features/auth/password-reset/PasswordResetPage";
-import RegistrationPage from "@/features/auth/registration/RegistrationPage";
-import VerifyEmailPage from "@/features/auth/verify-email/VerifyEmailPage";
 import { RouteObject } from "react-router-dom";
+
+import { AuthLayout } from "@/components/layout/auth-layout";
+import { ForgotPasswordPage } from "@/features/auth/forgot-password/forgot-password";
+import { LoginPage } from "@/features/auth/login/login";
+import { PasswordResetPage } from "@/features/auth/password-reset/password-reset";
+import { RegistrationPage } from "@/features/auth/registration/registration";
+import { VerifyEmailPage } from "@/features/auth/verify-email/verify-email";
 
 export const authRoutes: RouteObject = {
   element: <AuthLayout />,
