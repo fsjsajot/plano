@@ -15,7 +15,8 @@ class Workspace extends Model
     protected $fillable = [
         'name',
         'description',
-        'user_id'
+        'user_id',
+        'logo_path'
     ];
 
     public function owner(): BelongsTo {

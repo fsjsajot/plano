@@ -9,6 +9,7 @@ use App\Http\Controllers\StatusController;
 use App\Http\Controllers\UserController;
 use App\Http\Controllers\WorkspaceController;
 use App\Http\Controllers\WorkspaceInviteController;
+use App\Http\Controllers\WorkspaceLogoUploadController;
 use App\Http\Controllers\WorkspaceMemberController;
 use Illuminate\Support\Facades\Route;
 
@@ -33,4 +34,6 @@ Route::middleware(['auth:sanctum'])->group(function () {
 
     Route::get('workspaces/{workspace}/members/{memberId}', [WorkspaceMemberController::class, 'show']);
     Route::apiResource('workspaces.members', WorkspaceMemberController::class)->only(['index', 'destroy']);
+    
+    Route::post('workspaces/{workspace}/upload', WorkspaceLogoUploadController::class);
 });
