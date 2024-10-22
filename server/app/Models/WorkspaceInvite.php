@@ -15,7 +15,8 @@ class WorkspaceInvite extends Model
         'invite_type',
         'workspace_id',
         'email',
-        'token'
+        'token',
+        'disabled_at'
     ];
 
     public function workspace() : BelongsTo {
