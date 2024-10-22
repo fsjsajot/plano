@@ -4,6 +4,7 @@ namespace App\Http\Resources;
 
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
+use Illuminate\Support\Facades\Storage;
 
 class WorkspaceResource extends JsonResource
 {
@@ -21,7 +22,9 @@ class WorkspaceResource extends JsonResource
             "owner_id" => $this->user_id,
             "created_at" => $this->created_at,
             "updated_at" => $this->updated_at,
-            "owner" => new UserResource($this->owner)
+            "owner" => new UserResource($this->owner),
+            "logo_path" => $this->logo_path,
+            "logo_url" => config('app.url') . Storage::url($this->logo_path)
         ];
     }
 }
