@@ -18,10 +18,12 @@ Route::apiResource('workspaces.invites', WorkspaceInviteController::class)->only
 Route::get('workspaces/{workspace}/invites/{token?}', [WorkspaceInviteController::class, 'show']);
 Route::post('workspaces/{workspace}/invites/{token}/accept', [WorkspaceInviteController::class, 'acceptInvite']);
 
+Route::apiResource('workspaces.boards.items.files', BoardItemFileController::class)->only(['show']);
+
 // invite by email
 Route::get('workspaces/{workspace}/invited/{token}', [WorkspaceInviteController::class, 'acceptEmailInvite'])->middleware(['auth:sanctum']);
 
-Route::middleware(['auth:sanctum', 'verified'])->get('/user', [UserController::class, "show"])->name("current.user");
+Route::middleware(['auth:sanctum'])->get('/user', [UserController::class, "show"])->name("current.user");
 
 Route::middleware(['auth:sanctum'])->group(function () {
     Route::apiResource('workspaces', WorkspaceController::class);
