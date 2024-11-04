@@ -133,7 +133,9 @@ export const EditWorkspaceDetails = ({
             <h1 className="font-bold">Workspace Logo</h1>
             <Avatar className="h-40 w-40 rounded-md">
               <AvatarImage src={workspace.logoUrl} alt="workspace logo" />
-              <AvatarFallback className="text-6xl rounded-md">B</AvatarFallback>
+              <AvatarFallback className="text-6xl rounded-md">
+                {workspace.name.charAt(0).toUpperCase()}
+              </AvatarFallback>
             </Avatar>
             <input
               accept="image/*"

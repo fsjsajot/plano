@@ -26,7 +26,7 @@ export const ManageWorkspace = ({}) => {
         <div className="ml-4 flex items-center gap-4">
           <Avatar className="h-14 w-14 rounded-md">
             <AvatarImage src={workspace.logoUrl} alt="workspace logo" />
-            <AvatarFallback className="text-2xl rounded-md">B</AvatarFallback>
+            <AvatarFallback className="text-2xl rounded-md">{workspace.name.charAt(0).toUpperCase()}</AvatarFallback>
           </Avatar>
           <div className="flex flex-col">
             <h3 className="text-xl font-medium leading-normal tracking-tight">
