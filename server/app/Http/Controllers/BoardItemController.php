@@ -27,8 +27,8 @@ class BoardItemController extends Controller
     {
         $validatedData = $request->validate([
             'title' => ['required', 'string'],
-            'description' => ['nullable'],
-            'status_id' => ['required']
+            'description' => ['required'],
+            'status_id' => ['nullable']
         ]);
 
         $validatedData['user_id'] = Auth::user()->id;
@@ -43,6 +43,9 @@ class BoardItemController extends Controller
      */
     public function show(Workspace $workspace, Board $board, BoardItem $item)
     {
+        $item->load(['user']);
+        $item->loadCount(['itemVotes']);
+
         return new BoardItemResource($item);
     }
 
@@ -57,13 +60,16 @@ class BoardItemController extends Controller
 
         $validatedData = $request->validate([
             'title' => ['required', 'string'],
-            'description' => ['nullable'],
-            'status_id' => ['required']
+            'description' => ['required'],
+            'status_id' => ['nullable']
         ]);
 
         $item->title = $validatedData['title'];
         $item->description = $validatedData['description'];
-        $item->status_id = $validatedData['status_id'];
+
+        if ($request->has('status_id')) {
+            $item->status_id = $request->status_id == 0 ? null : $request->status_id;
+        }
 
         $item->save();
 

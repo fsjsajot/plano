@@ -20,9 +20,10 @@ class BoardItemResource extends JsonResource
             "description" => $this->description,
             "status_id" => $this->status_id,
             "board_id" => $this->board_id,
-            "author_id" => $this->user_id,
+            "author" => new UserResource($this->whenLoaded('user')),
+            "votes" => $this->whenCounted('itemVotes'),
             "created_at" => $this->created_at,
-            "updated_at" => $this->updated_at
+            "updated_at" => $this->updated_at,
         ];
     }
 }

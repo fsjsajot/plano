@@ -14,9 +14,9 @@ class BoardItem extends Model
 
     protected $fillable = ['title', 'description', 'status_id', 'board_id', 'user_id'];
 
-    public function status(): HasOne
+    public function status(): belongsTo
     {
-        return $this->hasOne(Status::class);
+        return $this->belongsTo(Status::class);
     }
 
     public function files(): HasMany
