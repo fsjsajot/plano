@@ -10,6 +10,8 @@ class UserController extends Controller
 
     public function show(Request $request)
     {
-        return new UserResource($request->user());
+        $userWithWorkspaces = $request->user()->load(['workspaces']);
+
+        return new UserResource($userWithWorkspaces);
     }
 }

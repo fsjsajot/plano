@@ -39,6 +39,8 @@ class BoardController extends Controller
      */
     public function show(Workspace $workspace, Board $board)
     {
+        $board->load(['boardItems.user']);
+        
         return new BoardResource($board);
     }
 
