@@ -17,9 +17,9 @@ class ItemCommentController extends Controller
      */
     public function index(Workspace $workspace, Board $board, BoardItem $item)
     {
-        $comments = $item->commentsWithReplies();
+        $comments = ItemComment::treeOf(fn($query) => $query->isRoot()->where('board_item_id', $item->id), 3)->orderBy('created_at')->get()->toTree();
 
-        return response()->json(["data" => $comments]);
+        return ItemCommentResource::collection($comments);
     }
 
     /**

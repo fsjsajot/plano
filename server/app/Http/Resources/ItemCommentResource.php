@@ -17,11 +17,13 @@ class ItemCommentResource extends JsonResource
         return [
             "id" => $this->id,
             "comment" => $this->comment,
-            "author_id" => $this->user_id,
+            "author" => new UserResource($this->user),
             "board_item_id" => $this->board_item_id,
             "parent_id" => $this->parent_id,
             "created_at" => $this->created_at,
-            "updated_at" => $this->updated_at
+            "updated_at" => $this->updated_at,
+            "depth" => $this->depth,
+            "children" => $this->when(!empty($this->children), ItemCommentResource::collection($this->children))
         ];
     }
 }
