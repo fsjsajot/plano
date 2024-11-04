@@ -12,20 +12,23 @@ export const getBoards = async (workspaceId: number) => {
   return response.data;
 };
 
-export const getBoardsOptions = (workspaceId: number) => {
+export const getBoardsOptions = (workspaceId?: number) => {
   return queryOptions({
     queryKey: ["workspace_boards", workspaceId],
-    queryFn: () => getBoards(workspaceId),
+    queryFn: () => getBoards(workspaceId!),
     staleTime: Infinity,
+    enabled: !!workspaceId
   });
 };
 
 type UseBoardsOptions = {
-  workspaceId: number;
+  workspaceId?: number;
   queryConfig?: QueryConfig<typeof getBoardsOptions>;
 };
 
 export const useBoards = ({ workspaceId, queryConfig }: UseBoardsOptions) => {
+
+  console.log({workspaceId})
   return useQuery({
     ...getBoardsOptions(workspaceId),
     ...queryConfig,
