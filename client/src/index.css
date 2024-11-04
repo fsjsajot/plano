@@ -77,3 +77,10 @@
     @apply font-sans
   }
 }
+
+@layer components {
+  .prose {
+    @apply font-sans;
+    min-width: 0;
+  }
+}
