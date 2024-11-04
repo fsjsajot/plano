@@ -1,13 +1,13 @@
-import React from "react";
-import { Navigate } from "react-router-dom";
-
-import { Button } from "@/components/ui/button";
-import { LoadingSpinner } from "@/components/ui/loading-spinner";
-import { useAuth } from "@/features/auth/hooks/use-auth";
 import { useAuthUser } from "@/features/auth/hooks/use-auth-user";
 import { AppHeader } from "./app-header";
+import { useAuth } from "@/features/auth/hooks/use-auth";
+import { LoadingSpinner } from "../ui/loading-spinner";
+import { Navigate } from "react-router-dom";
+import { Button } from "../ui/button";
 
-export const AppLayout = ({ children }: { children: React.ReactNode }) => {
+import { WorkspaceSwitcher } from "@/features/home/components/workspace-switcher";
+
+export const HomeLayout = ({ children }: { children: React.ReactNode }) => {
   const { data, isLoading } = useAuthUser();
   const { logout } = useAuth();
 
@@ -25,13 +25,14 @@ export const AppLayout = ({ children }: { children: React.ReactNode }) => {
   return (
     <div className="flex flex-col w-full min-h-dvh">
       <AppHeader>
-        {data && (
-          <div className="flex justify-end w-full">
+        <div className="flex justify-end w-full gap-4">
+          <WorkspaceSwitcher />
+          {data && (
             <Button onClick={logout} variant="ghost">
               Logout
             </Button>
-          </div>
-        )}
+          )}
+        </div>
       </AppHeader>
       <main className="flex-1 flex">{children}</main>
     </div>

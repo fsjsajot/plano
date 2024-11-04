@@ -2,6 +2,7 @@ import { Navigate } from "react-router-dom";
 
 import { LoadingSpinner } from "@/components/ui/loading-spinner";
 import { useAuthUser } from "@/features/auth/hooks/use-auth-user";
+import { Home } from "@/features/home/components/home";
 
 export const RootLayout = () => {
   const { data, isLoading } = useAuthUser();
@@ -13,9 +14,9 @@ export const RootLayout = () => {
       </div>
     );
 
-  if (data) {
-    return <Navigate to="/workspaces" replace />;
+  if (!data) {
+    return <Navigate to="/login" replace />;
   }
 
-  return <Navigate to="/login" replace />;
+  return <Home />;
 };
