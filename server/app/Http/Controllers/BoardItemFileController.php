@@ -20,6 +20,10 @@ class BoardItemFileController extends Controller
         return BoardItemFileResource::collection($boardItemFiles);
     }
 
+    public function show(Workspace $workspace, Board $board, BoardItem $item, BoardItemFile $file, Request $request) {
+        return Storage::download("public/{$file->path}");
+    }
+
     /**
      * Store a newly created resource in storage.
      */
@@ -39,10 +43,14 @@ class BoardItemFileController extends Controller
 
         foreach ($files as $file) {
             $type = $file->getMimeType();
-            $filepath = Storage::disk('public')->putFileAs("files/board/{$item->id}", $file, $file->hashName());
+            $file_name = pathinfo($file->getClientOriginalName(), PATHINFO_FILENAME);
+            $file_extension = pathinfo($file->getClientOriginalName(), PATHINFO_EXTENSION);
+
+            $filename_id = $file_name . "_" . time() . "." . $file_extension;
+            $filepath = Storage::disk('public')->putFileAs("files/board/{$item->id}", $file, $filename_id);
 
             $boardItemFiles[] = [
-                "name" => $file->hashName(),
+                "name" => "{$file_name}.{$file_extension}",
                 "path" => $filepath,
                 "type" => $type
             ];
