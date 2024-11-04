@@ -12,16 +12,17 @@ export const getStatuses = async (workspaceId: number) => {
   return response.data;
 };
 
-export const getStatusesOptions = (workspaceId: number) => {
+export const getStatusesOptions = (workspaceId?: number) => {
   return queryOptions({
     queryKey: ["workspace_statuses", workspaceId],
-    queryFn: () => getStatuses(workspaceId),
+    queryFn: () => getStatuses(workspaceId!),
     staleTime: Infinity,
+    enabled: !!workspaceId
   });
 };
 
 type UseStatusesOptions = {
-  workspaceId: number;
+  workspaceId?: number;
   queryConfig?: QueryConfig<typeof getStatusesOptions>;
 };
 
