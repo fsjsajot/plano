@@ -1,10 +1,11 @@
 export interface User {
-  id: string;
+  id: number;
   name: string;
   email: string;
   createdAt: string;
   updatedAt: string;
   emailVerifiedAt: string;
+  workspaces: Workspace[];
 }
 
 export interface Workspace {
@@ -24,6 +25,7 @@ export interface Board {
   description: string;
   createdAt: string;
   updatedAt: string;
+  items: BoardItem[]
 }
 
 export interface Status {
@@ -45,4 +47,40 @@ export interface WorkspaceInvite {
   disabledAt: string;
   createdAt: string;
   updatedAt: string;
+}
+
+export interface BoardItem {
+  id: number;
+  title: string;
+  description: string;
+  createdAt: string;
+  updatedAt: string;
+  author: User;
+  boardId: number;
+  statusId: number;
+}
+
+export interface BoardItemFile {
+  id: number;
+  name: string;
+  url: string;
+  size: number;
+  width: number;
+  height: number;
+  type: string;
+  boardItemId: number;
+  createdAt: string;
+  updatedAt: string;
+}
+
+export interface ItemComment {
+  id: number;
+  comment: string;
+  createdAt: string;
+  updatedAt: string;
+  author: User;
+  boardItemId: number;
+  parentId: number;
+  depth: number;
+  children: ItemComment[]
 }
