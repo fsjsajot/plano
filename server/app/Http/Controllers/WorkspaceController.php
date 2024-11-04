@@ -12,8 +12,8 @@ class WorkspaceController extends Controller
     public function index()
     {
         $authUser = Auth::user();
-        $workspaces = Workspace::where('user_id', $authUser->id)->orderBy('created_at', 'asc')->get();
 
+        $workspaces = $authUser->workspaces;
         return WorkspaceResource::collection($workspaces);
     }
 

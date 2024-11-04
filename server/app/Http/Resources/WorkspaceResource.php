@@ -24,7 +24,7 @@ class WorkspaceResource extends JsonResource
             "updated_at" => $this->updated_at,
             "owner" => new UserResource($this->owner),
             "logo_path" => $this->logo_path,
-            "logo_url" => config('app.url') . Storage::url($this->logo_path)
+            "logo_url" => $this->when(!is_null($this->logo_path), asset(Storage::url($this->logo_path)))
         ];
     }
 }
