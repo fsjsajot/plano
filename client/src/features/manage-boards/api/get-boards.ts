@@ -27,8 +27,6 @@ type UseBoardsOptions = {
 };
 
 export const useBoards = ({ workspaceId, queryConfig }: UseBoardsOptions) => {
-
-  console.log({workspaceId})
   return useQuery({
     ...getBoardsOptions(workspaceId),
     ...queryConfig,
