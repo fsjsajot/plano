@@ -1,4 +1,4 @@
-import { CaretUp, FunnelSimple } from "@phosphor-icons/react";
+import { FunnelSimple } from "@phosphor-icons/react";
 import { Link, useParams } from "react-router-dom";
 
 import { Button, buttonVariants } from "@/components/ui/button";
@@ -17,11 +17,14 @@ import { BoardItem } from "@/types/entities";
 import { useBoard } from "../api/get-board";
 import { BoardLayout } from "./board-layout";
 import { HomeLayout } from "@/components/layout/home-layout";
+import { useAuthUser } from "@/features/auth/hooks/use-auth-user";
+import { VotePostListItem } from "./vote-post-list-item";
 
 export const Board = ({}) => {
   const { boardId = "" } = useParams();
   const { selectedWorkspaceId } = useHomeContext();
 
+  const { data: user, isLoading: isUserLoading } = useAuthUser();
   const { data: board, isLoading } = useBoard({
     workspaceId: selectedWorkspaceId,
     boardId: Number(boardId),
@@ -30,7 +33,7 @@ export const Board = ({}) => {
     },
   });
 
-  if (isLoading) {
+  if (isLoading || isUserLoading) {
     return (
       <div className="flex h-full w-full items-center justify-center">
         <LoadingSpinner className="w-10 h-10" />
@@ -43,9 +46,13 @@ export const Board = ({}) => {
       <div className="flex flex-col">
         <div className="flex  px-4 first:pt-4 items-center gap-4">
           <div>
-            <Button variant="outline" size="sm">
-              <CaretUp className="mr-2" />1
-            </Button>
+            <VotePostListItem
+              workspaceId={selectedWorkspaceId!}
+              boardId={item.boardId}
+              itemId={item.id}
+              userId={user!.id}
+              item={item}
+            />
           </div>
 
           <div>
@@ -75,62 +82,62 @@ export const Board = ({}) => {
   );
 
   return (
-   <HomeLayout>
-     <BoardLayout>
-      <div className="px-8 py-8 space-y-8 ">
-        {board && (
-          <div className="flex w-full items-center">
-            <div className="flex flex-col">
-              <h4 className="font-bold">{board.name}</h4>
-              <p className="text-sm">{board.description}</p>
-            </div>
+    <HomeLayout>
+      <BoardLayout>
+        <div className="px-8 py-8 space-y-8 ">
+          {board && (
+            <div className="flex w-full items-center">
+              <div className="flex flex-col">
+                <h4 className="font-bold">{board.name}</h4>
+                <p className="text-sm">{board.description}</p>
+              </div>
 
-            <div className="flex-1 justify-end flex">
-              <Link
-                className={buttonVariants()}
-                to={`/app/${selectedWorkspaceId}/boards/${board.id}/new`}
-              >
-                Create Post
-              </Link>
-            </div>
-          </div>
-        )}
-
-        <div className="flex space-x-4">
-          <Input placeholder="Search posts" className="w-64" />
-
-          <DropdownMenu>
-            <DropdownMenuTrigger asChild>
-              <Button variant="outline">
-                <FunnelSimple className="mr-2" />
-                Sort
-              </Button>
-            </DropdownMenuTrigger>
-            <DropdownMenuContent>
-              <DropdownMenuLabel>My Account</DropdownMenuLabel>
-              <DropdownMenuSeparator />
-              <DropdownMenuItem>Profile</DropdownMenuItem>
-              <DropdownMenuItem>Billing</DropdownMenuItem>
-              <DropdownMenuItem>Team</DropdownMenuItem>
-              <DropdownMenuItem>Subscription</DropdownMenuItem>
-            </DropdownMenuContent>
-          </DropdownMenu>
-        </div>
-
-        <div className="flex flex-col">
-          {board && (!board.items || board.items.length === 0) && (
-            <div className="border border-dashed">
-              <div className="flex p-4 justify-center items-center gap-4">
-                <h4>No posts to display</h4>
+              <div className="flex-1 justify-end flex">
+                <Link
+                  className={buttonVariants()}
+                  to={`/app/${selectedWorkspaceId}/boards/${board.id}/new`}
+                >
+                  Create Post
+                </Link>
               </div>
             </div>
           )}
-          {board &&
-            board.items &&
-            board.items.map((item) => <Item item={item} key={item.id} />)}
+
+          <div className="flex space-x-4">
+            <Input placeholder="Search posts" className="w-64" />
+
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <Button variant="outline">
+                  <FunnelSimple className="mr-2" />
+                  Sort
+                </Button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent>
+                <DropdownMenuLabel>My Account</DropdownMenuLabel>
+                <DropdownMenuSeparator />
+                <DropdownMenuItem>Profile</DropdownMenuItem>
+                <DropdownMenuItem>Billing</DropdownMenuItem>
+                <DropdownMenuItem>Team</DropdownMenuItem>
+                <DropdownMenuItem>Subscription</DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
+          </div>
+
+          <div className="flex flex-col">
+            {board && (!board.items || board.items.length === 0) && (
+              <div className="border border-dashed">
+                <div className="flex p-4 justify-center items-center gap-4">
+                  <h4>No posts to display</h4>
+                </div>
+              </div>
+            )}
+            {board &&
+              board.items &&
+              board.items.map((item) => <Item item={item} key={item.id} />)}
+          </div>
         </div>
-      </div>
-    </BoardLayout>
-   </HomeLayout>
+      </BoardLayout>
+    </HomeLayout>
   );
 };

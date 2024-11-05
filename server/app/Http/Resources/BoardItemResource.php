@@ -21,7 +21,7 @@ class BoardItemResource extends JsonResource
             "status_id" => $this->status_id,
             "board_id" => $this->board_id,
             "author" => new UserResource($this->whenLoaded('user')),
-            "votes" => $this->whenCounted('itemVotes'),
+            "votes" => ItemVoteResource::collection($this->whenLoaded('itemVotes')),
             "created_at" => $this->created_at,
             "updated_at" => $this->updated_at,
         ];

@@ -1,16 +1,18 @@
-import { Button, buttonVariants } from "@/components/ui/button";
-import { CaretUp, Pencil, Trash } from "@phosphor-icons/react";
+import { Pencil, Trash } from "@phosphor-icons/react";
+import { useState } from "react";
 import { useParams } from "react-router-dom";
-import { usePost } from "../api/get-post";
-import { LoadingSpinner } from "@/components/ui/loading-spinner";
+
 import { HomeLayout } from "@/components/layout/home-layout";
+import { Button, buttonVariants } from "@/components/ui/button";
+import { LoadingSpinner } from "@/components/ui/loading-spinner";
+import { useAuthUser } from "@/features/auth/hooks/use-auth-user";
 import { BoardLayout } from "@/features/board/components/board-layout";
 import { usePostAttachments } from "../api/get-files";
+import { usePost } from "../api/get-post";
 import { Attachments } from "./attachments";
-import { useAuthUser } from "@/features/auth/hooks/use-auth-user";
-import { useState } from "react";
-import { DeletePostDialog } from "./delete-post-dialog";
 import { CommentSection } from "./comment-section";
+import { DeletePostDialog } from "./delete-post-dialog";
+import { VotePost } from "./vote-post";
 
 export const Post = () => {
   const { workspaceId = "", boardId = "", itemId = "" } = useParams();
@@ -50,9 +52,13 @@ export const Post = () => {
           </h3>
           <div className="flex">
             <div className="mr-4">
-              <Button size="icon" variant="outline">
-                <CaretUp />
-              </Button>
+              <VotePost
+                workspaceId={Number(workspaceId)}
+                boardId={Number(boardId)}
+                itemId={Number(itemId)}
+                userId={user.id}
+                item={item}
+              />
             </div>
             <div className="flex-1">
               <p>{item.description}</p>

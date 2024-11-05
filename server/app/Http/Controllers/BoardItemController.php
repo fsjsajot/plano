@@ -43,8 +43,7 @@ class BoardItemController extends Controller
      */
     public function show(Workspace $workspace, Board $board, BoardItem $item)
     {
-        $item->load(['user']);
-        $item->loadCount(['itemVotes']);
+        $item->load(['user', 'itemVotes']);
 
         return new BoardItemResource($item);
     }

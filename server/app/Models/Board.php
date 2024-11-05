@@ -20,6 +20,6 @@ class Board extends Model
 
     public function boardItems(): HasMany
     {
-        return $this->hasMany(BoardItem::class)->withCount(['itemVotes']);
+        return $this->hasMany(BoardItem::class)->with(['itemVotes']);
     }
 }

@@ -58,6 +58,7 @@ export interface BoardItem {
   author: User;
   boardId: number;
   statusId: number;
+  votes: ItemVote[];
 }
 
 export interface BoardItemFile {
@@ -83,4 +84,12 @@ export interface ItemComment {
   parentId: number;
   depth: number;
   children: ItemComment[]
+}
+
+export interface ItemVote {
+  id: number;
+  userId: number;
+  boardItemId: number;
+  createdAt: string;
+  updatedAt: string;
 }
