@@ -1,3 +1,19 @@
+export interface PaginatedResponse {
+  links: {
+    next: string | null;
+    first: string | null;
+    prev: string | null;
+    last: string | null;
+  };
+
+  meta: {
+    nextCursor: string | null;
+    prevCursor: string | null;
+    perPage: number;
+    path: string;
+  };
+}
+
 export interface User {
   id: number;
   name: string;
@@ -6,6 +22,7 @@ export interface User {
   updatedAt: string;
   emailVerifiedAt: string;
   workspaces: Workspace[];
+  avatarUrl: string;
 }
 
 export interface Workspace {
@@ -25,7 +42,7 @@ export interface Board {
   description: string;
   createdAt: string;
   updatedAt: string;
-  items: BoardItem[]
+  items: BoardItem[];
 }
 
 export interface Status {
@@ -35,6 +52,8 @@ export interface Status {
   visibility: boolean;
   createdAt: string;
   updatedAt: string;
+  items?: BoardItem[];
+  workspaceId: number;
 }
 
 export interface WorkspaceInvite {
@@ -59,6 +78,8 @@ export interface BoardItem {
   boardId: number;
   statusId: number;
   votes: ItemVote[];
+  status?: Status;
+  voteCount: number;
 }
 
 export interface BoardItemFile {
@@ -83,7 +104,7 @@ export interface ItemComment {
   boardItemId: number;
   parentId: number;
   depth: number;
-  children: ItemComment[]
+  children: ItemComment[];
 }
 
 export interface ItemVote {
@@ -92,4 +113,8 @@ export interface ItemVote {
   boardItemId: number;
   createdAt: string;
   updatedAt: string;
+}
+
+export interface PaginatedBoardItem extends PaginatedResponse {
+  data: BoardItem[];
 }
