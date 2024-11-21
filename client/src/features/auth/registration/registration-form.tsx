@@ -21,7 +21,7 @@ const formSchema = z.object({
     .string()
     .min(1, { message: "Name field is required." })
     .max(255, { message: "Name field must contain at most 255 character(s)" }),
-  email: z.string().min(1, { message: "Email field is required." }).email(),
+  email: z.string().min(1, { message: "Email field is required." }).email().transform(email => email.toLowerCase()),
   password: z.string().min(1, { message: "Password field is required." }),
 });
 

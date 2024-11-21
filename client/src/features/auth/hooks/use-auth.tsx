@@ -87,13 +87,12 @@ export const useAuth = () => {
   };
 
   const logout = async () => {
-    await http
-      .post("/logout")
-      .then(() =>
-        queryClient.invalidateQueries({
-          queryKey: ["me"],
-        })
-      );
+    await http.post("/logout").then(() => {
+      queryClient.invalidateQueries({
+        queryKey: ["me"],
+      });
+      queryClient.clear();
+    });
   };
 
   return {

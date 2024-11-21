@@ -5,7 +5,13 @@ import { http } from "@/lib/http";
 import { User } from "@/types/entities";
 import { useNavigate } from "react-router-dom";
 
-export const useAuthUser = () => {
+export const useAuthUser = (
+  {
+    shouldRedirect,
+  }: {
+    shouldRedirect: boolean;
+  } = { shouldRedirect: true }
+) => {
   const navigate = useNavigate();
   const getCurrentUser = async () => {
     try {
@@ -16,6 +22,11 @@ export const useAuthUser = () => {
       if (axios.isAxiosError(error) && error.response) {
         if (error.response.status !== 409) {
           console.log(error);
+
+          if (shouldRedirect) {
+            navigate("/login", { replace: true });
+          }
+
           return null;
         }
 
@@ -25,12 +36,14 @@ export const useAuthUser = () => {
 
         return null;
       }
+
+      throw error;
     }
   };
 
   return useQuery({
     queryKey: ["me"],
     queryFn: async () => getCurrentUser(),
-    staleTime: Infinity,
+    staleTime: 1000 * 60 * 60 * 12, // 12 hours
   });
 };
