@@ -1,4 +1,4 @@
-import { Link, Navigate, Outlet } from "react-router-dom";
+import { Link, Navigate, Outlet, useLocation } from "react-router-dom";
 
 import { Button } from "@/components/ui/button";
 import { LoadingSpinner } from "@/components/ui/loading-spinner";
@@ -6,8 +6,9 @@ import { useAuth } from "@/features/auth/hooks/use-auth";
 import { useAuthUser } from "@/features/auth/hooks/use-auth-user";
 
 export const AuthLayout = () => {
-  const { data, isLoading } = useAuthUser();
+  const { data, isLoading } = useAuthUser({ shouldRedirect: false });
   const { logout } = useAuth();
+  const location = useLocation();
 
   if (isLoading)
     return (
@@ -16,8 +17,8 @@ export const AuthLayout = () => {
       </div>
     );
 
-  if (data) {
-    return <Navigate to={`/workspaces`} replace />;
+  if (data && location.pathname !== "/verify-email") {
+    return <Navigate to={'/'} replace />;
   }
 
   return (
