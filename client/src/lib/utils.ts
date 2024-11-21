@@ -1,5 +1,6 @@
 import { clsx, type ClassValue } from "clsx";
 import { twMerge } from "tailwind-merge";
+import dayjs from "dayjs";
 
 export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs));
@@ -12,10 +13,9 @@ export const fileSizeFormatter = new Intl.NumberFormat("en", {
   unitDisplay: "narrow",
 });
 
-
-export const dateFormatter = new Intl.DateTimeFormat('en-US', {
-  dateStyle: 'long',
-  timeStyle: 'short',
+export const dateFormatter = new Intl.DateTimeFormat("en-US", {
+  dateStyle: "long",
+  timeStyle: "short",
 });
 
 export const formatFileSize = (bytes: number) =>
@@ -41,4 +41,11 @@ export const timeAgo = (input: any) => {
       return formatter.format(Math.round(delta), rangeType);
     }
   }
+};
+
+export const getVerificationDue = (input: string) => {
+  const createdDate = dayjs(input);
+  const dueDate = createdDate.add(2, "weeks");
+
+  return dueDate.diff(dayjs(), 'day');
 };

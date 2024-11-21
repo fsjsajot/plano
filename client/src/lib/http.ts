@@ -12,7 +12,7 @@ export const http = axios.create({
 http.interceptors.response.use((response) => {
   const data = response.data;
 
-  if (Object.prototype.hasOwnProperty.call(data, "data")) {
+  if (Object.prototype.hasOwnProperty.call(data, "data") && !data.links) {
     return data;
   }
 
