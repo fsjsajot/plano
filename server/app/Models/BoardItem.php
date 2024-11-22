@@ -34,7 +34,7 @@ class BoardItem extends Model
         return $this->belongsTo(User::class);
     }
 
-    public function itemVotes(): HasMany
+    public function item_votes(): HasMany
     {
         return $this->hasMany(ItemVote::class);
     }
