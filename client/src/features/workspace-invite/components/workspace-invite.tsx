@@ -1,15 +1,29 @@
 import { Link, useLocation, useParams } from "react-router-dom";
 
-import { buttonVariants } from "@/components/ui/button";
+import { Button, buttonVariants } from "@/components/ui/button";
 import { LoadingSpinner } from "@/components/ui/loading-spinner";
 import { useAuthUser } from "@/features/auth/hooks/use-auth-user";
 import { AuthenticatedInviteScreen } from "./authenticated-invite-screen";
 import { useWorkspaceTokenInvite } from "../api/get-workspace-invite-token";
+import { AppHeader } from "@/components/layout/app-header";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { useAuth } from "@/features/auth/hooks/use-auth";
 
 export const WorkspaceInvite = () => {
   const { workspaceId = "", token = "" } = useParams();
 
-  const { data: user, isLoading: isUserLoading } = useAuthUser();
+  const { logout } = useAuth();
+  const { data: user, isLoading: isUserLoading } = useAuthUser({
+    shouldRedirect: false,
+  });
 
   const { data: tokenInvite, isLoading: isTokenInviteLoading } =
     useWorkspaceTokenInvite({
@@ -35,17 +49,54 @@ export const WorkspaceInvite = () => {
 
   return (
     <div className="flex flex-col w-full min-h-dvh">
-      <header className="z-10 sticky top-0 flex h-14 items-center gap-4 border-b bg-background px-4 md:px-6">
-        <nav className="flex-col gap-6 text-lg font-medium md:flex md:flex-row md:items-center md:gap-5 md:text-sm lg:gap-6">
-          <Link
-            to="/"
-            className="flex items-center gap-2 text-lg font-semibold md:text-base"
-          >
-            plano
-            <span className="sr-only">Acme Inc</span>
-          </Link>
-        </nav>
-      </header>
+      <AppHeader>
+        <div className="flex justify-end w-full gap-2">
+          {user && (
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <Button
+                  size="sm"
+                  variant="ghost"
+                  className="outline-none hover:bg-transparent border-none rounded-full p-0"
+                >
+                  <Avatar>
+                    <AvatarImage src={user.avatarUrl} alt="user avatar" />
+                    <AvatarFallback>
+                      {user.name.charAt(0).toUpperCase()}
+                    </AvatarFallback>
+                  </Avatar>
+                </Button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent sideOffset={10}>
+                <DropdownMenuLabel className="px-4">Account</DropdownMenuLabel>
+                <div className="inline-flex gap-4 min-w-64 py-2 px-4">
+                  <Avatar>
+                    <AvatarImage src={user.avatarUrl} alt="user avatar" />
+                    <AvatarFallback>
+                      {user.name.charAt(0).toUpperCase()}
+                    </AvatarFallback>
+                  </Avatar>
+                  <div className="inline-flex flex-col">
+                    <div>{user.name}</div>
+                    <div className="text-sm">{user.email}</div>
+                  </div>
+                </div>
+                <DropdownMenuSeparator />
+                <DropdownMenuItem asChild className="px-4">
+                  <Link to="/account_settings">Settings</Link>
+                </DropdownMenuItem>
+                <DropdownMenuItem asChild className="px-4">
+                  <Link to="/workspaces">Manage Workspaces</Link>
+                </DropdownMenuItem>
+                <DropdownMenuSeparator />
+                <DropdownMenuItem onSelect={logout} className="px-4">
+                  Logout
+                </DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
+          )}
+        </div>
+      </AppHeader>
       <main className="flex-1">
         <div className=" min-w-full min-h-[calc(100dvh-3.5rem)]">
           <div className="flex justify-start flex-col min-h-[inherit] p-32 gap-4  items-center w-full">

@@ -1,8 +1,10 @@
+import { zodResolver } from "@hookform/resolvers/zod";
+import { X } from "@phosphor-icons/react";
 import { useQueryClient } from "@tanstack/react-query";
 import { useState } from "react";
+import { useForm } from "react-hook-form";
 import { toast } from "sonner";
 import { z } from "zod";
-import { X } from "@phosphor-icons/react";
 
 import { Button } from "@/components/ui/button";
 import {
@@ -18,7 +20,19 @@ import { LoadingSpinner } from "@/components/ui/loading-spinner";
 import { cn } from "@/lib/utils";
 import { useCreateWorkspaceInvite } from "../api/create-workspace-invite";
 
-const entrySchema = z.string().min(1).email();
+import {
+  Form,
+  FormControl,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
+} from "@/components/ui/form";
+
+const entrySchema = z.object({
+  email: z.string().min(1).email(),
+});
+type EntrySchemaType = z.infer<typeof entrySchema>;
 
 interface InviteMemberDialogProps {
   memberEmails: string[];
@@ -33,7 +47,6 @@ export const InviteMemberDialog = ({
   open,
   onOpenChange,
 }: InviteMemberDialogProps) => {
-  const [emailInput, setEmailInput] = useState("");
   const [emails, setEmails] = useState<string[]>([]);
 
   const queryClient = useQueryClient();
@@ -50,20 +63,20 @@ export const InviteMemberDialog = ({
     }
   );
 
-  const handleAddEntry = () => {
-    const validate = entrySchema.safeParse(emailInput);
+  const allEmails = (memberEmails || []).concat(emails);
+  const form = useForm<EntrySchemaType>({
+    resolver: zodResolver(entrySchema),
+    defaultValues: {
+      email: "",
+    },
+  });
 
-    if (validate.success) {
-      if ((memberEmails || []).concat(emails).includes(emailInput)) {
-        console.error("Email already exists.");
-        toast.error("Email already exists.");
-      } else {
-        setEmails((currentEmails) => [...currentEmails, emailInput]);
-        setEmailInput("");
-      }
+  const onAdd = ({ email }: EntrySchemaType) => {
+    if (allEmails.includes(email)) {
+      toast.error("Email already exists.");
     } else {
-      console.error(validate.error.issues[0]);
-      toast.error(validate.error.issues[0].message);
+      setEmails((currentEmails) => [...currentEmails, email]);
+      form.reset();
     }
   };
 
@@ -86,16 +99,38 @@ export const InviteMemberDialog = ({
         </DialogHeader>
 
         <div className="flex flex-col">
-          <div className="flex gap-4">
-            <Input
-              value={emailInput}
-              onChange={(e) => setEmailInput(e.target.value)}
-              placeholder="Enter email address"
-            />
-            <Button onClick={handleAddEntry} size="sm" variant="secondary">
-              Add
-            </Button>
-          </div>
+          <Form {...form}>
+            <form
+              onSubmit={form.handleSubmit(onAdd)}
+              className="flex gap-4 items-center"
+            >
+              <FormField
+                control={form.control}
+                name="email"
+                render={({ field }) => (
+                  <FormItem className="w-full">
+                    <FormLabel className="font-medium">Email</FormLabel>
+                    <FormControl>
+                      <div className="flex gap-4">
+                        <div className="flex flex-1">
+                          <Input
+                            placeholder="Enter email address"
+                            type="email"
+                            {...field}
+                          />
+                        </div>
+
+                        <Button size="sm" variant="secondary">
+                          Add
+                        </Button>
+                      </div>
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+            </form>
+          </Form>
         </div>
 
         <div

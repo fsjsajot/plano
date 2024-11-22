@@ -7,7 +7,7 @@ const acceptWorkspaceInvite = async ({
   workspaceId,
   token,
 }: {
-  workspaceId: string;
+  workspaceId: number;
   token: string;
 }) => {
   const response = await http.post(
