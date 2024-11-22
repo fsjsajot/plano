@@ -111,6 +111,9 @@ export const SortableContainer = ({
     });
   };
 
+  const canMarkAndDeleteStatuses =
+    items.filter((item) => item.visibility).length > 3;
+
   return (
     <DndContext
       sensors={sensors}
@@ -132,6 +135,7 @@ export const SortableContainer = ({
               setRowAction={setRowAction}
               key={`${status.id}-${idx}`}
               status={status}
+              canMarkAndDelete={canMarkAndDeleteStatuses}
             />
           ))}
 

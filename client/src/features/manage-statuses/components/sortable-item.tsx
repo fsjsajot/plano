@@ -26,12 +26,14 @@ interface SortableItemProps {
     React.SetStateAction<StatusListAction | undefined>
   >;
   toggleVisibility: () => void;
+  canMarkAndDelete?: boolean;
 }
 
 export const SortableItem = ({
   status,
   setRowAction,
   toggleVisibility,
+  canMarkAndDelete,
 }: SortableItemProps) => {
   const {
     attributes,
@@ -99,21 +101,26 @@ export const SortableItem = ({
               <Pencil className="mr-2" />
               Edit
             </DropdownMenuItem>
-            <DropdownMenuItem onClick={toggleVisibility}>
-              <ToggleRight className="mr-2" />
-              {`Mark as  ${status.visibility ? "Hidden" : "Visible"}`}
-            </DropdownMenuItem>
-            <DropdownMenuItem
-              onClick={() =>
-                setRowAction({
-                  type: "delete",
-                  data: status,
-                })
-              }
-            >
-              <Trash className="mr-2" />
-              Delete
-            </DropdownMenuItem>
+
+            {(canMarkAndDelete || !status.visibility) && (
+              <>
+                <DropdownMenuItem onClick={toggleVisibility}>
+                  <ToggleRight className="mr-2" />
+                  {`Mark as  ${status.visibility ? "Hidden" : "Visible"}`}
+                </DropdownMenuItem>
+                <DropdownMenuItem
+                  onClick={() =>
+                    setRowAction({
+                      type: "delete",
+                      data: status,
+                    })
+                  }
+                >
+                  <Trash className="mr-2" />
+                  Delete
+                </DropdownMenuItem>
+              </>
+            )}
           </DropdownMenuContent>
         </DropdownMenu>
       </div>

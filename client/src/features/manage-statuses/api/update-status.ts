@@ -45,7 +45,12 @@ export const useUpdateStatus = ({
 
     onMutate: async (updatedStatus) => {
       await queryClient.cancelQueries({
-        queryKey: ["workspace_statuses", updatedStatus.workspaceId],
+        queryKey: [
+          "workspace_statuses",
+          updatedStatus.workspaceId,
+          false,
+          false,
+        ],
       });
 
       const previousStatuses = queryClient.getQueryData([
@@ -54,7 +59,8 @@ export const useUpdateStatus = ({
       ]);
 
       queryClient.setQueryData<Status[]>(
-        ["workspace_statuses", updatedStatus.workspaceId],
+        ["workspace_statuses", updatedStatus.workspaceId, false, false],
+
         (prev) => {
           return (prev || []).map((status) => {
             if (status.id === Number(updatedStatus.statusId)) {
@@ -74,14 +80,14 @@ export const useUpdateStatus = ({
     onError: (error, variables, context) => {
       console.error(error);
       queryClient.setQueryData(
-        ["workspace_statuses", variables.workspaceId],
+        ["workspace_statuses", variables.workspaceId, false, false],
         context?.previousStatuses
       );
     },
 
     onSettled: async (_data, _error, variables) => {
       return await queryClient.invalidateQueries({
-        queryKey: ["workspace_statuses", variables.workspaceId],
+        queryKey: ["workspace_statuses", variables.workspaceId, false, false],
       });
     },
   });

@@ -32,11 +32,13 @@ export const EditStatusDialog = ({
   status,
   open,
   onOpenChange,
+  canMarkAndDelete,
 }: {
   workspaceId: string;
   status: Status;
   open: boolean;
   onOpenChange: () => void;
+  canMarkAndDelete: boolean;
 }) => {
   const { mutate, isPending } = useUpdateStatus({
     mutationConfig: {
@@ -84,25 +86,27 @@ export const EditStatusDialog = ({
                 </FormItem>
               )}
             />
-            <FormField
-              control={form.control}
-              name="visibility"
-              render={({ field }) => (
-                <FormItem className="flex flex-row items-start space-x-3 space-y-0">
-                  <FormControl>
-                    <Checkbox
-                      checked={field.value}
-                      onCheckedChange={field.onChange}
-                    />
-                  </FormControl>
-                  <div className="space-y-1 leading-none">
-                    <FormLabel>
-                      Make this status visible in the home page
-                    </FormLabel>
-                  </div>
-                </FormItem>
-              )}
-            />
+            {canMarkAndDelete && (
+              <FormField
+                control={form.control}
+                name="visibility"
+                render={({ field }) => (
+                  <FormItem className="flex flex-row items-start space-x-3 space-y-0">
+                    <FormControl>
+                      <Checkbox
+                        checked={field.value}
+                        onCheckedChange={field.onChange}
+                      />
+                    </FormControl>
+                    <div className="space-y-1 leading-none">
+                      <FormLabel>
+                        Make this status visible in the home page
+                      </FormLabel>
+                    </div>
+                  </FormItem>
+                )}
+              />
+            )}
 
             <div className="flex justify-end">
               <Button disabled={isPending} className="w-full" type="submit">
