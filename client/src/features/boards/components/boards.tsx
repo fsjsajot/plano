@@ -78,7 +78,7 @@ export const Boards = ({}) => {
 
   return (
     <div className="flex gap-4 w-full max-w-6xl mx-auto">
-      <div className="px-4     h-60 min-w-48 mt-8">
+      <div className="px-4 max-w-64 h-60 min-w-48 mt-8">
         <h1 className="font-bold text-sm">Boards</h1>
         <ScrollArea className="h-64 mt-2">
           {isBoardsLoading && (
