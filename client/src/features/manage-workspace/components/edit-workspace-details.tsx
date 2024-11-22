@@ -76,6 +76,33 @@ export const EditWorkspaceDetails = ({
     });
   };
 
+  const handleFileUpload = async (file: File) => {
+    const formData = new FormData();
+    formData.append("logo", file);
+
+    toast.info("Uploading logo...");
+    await http
+      .post(`/api/workspaces/${workspace.id}/upload`, formData, {
+        headers: {
+          "Content-Type": "multipart/form-data",
+        },
+      })
+      .then(() => {
+        queryClient.invalidateQueries({
+          queryKey: ["workspace", workspace.id],
+        });
+        toast.success("Updated workspace logo.");
+      })
+      .catch((error) => {
+        if (axios.isAxiosError(error)) {
+          return toast.error(error.response?.data.message);
+        }
+
+        console.error(error);
+        throw error;
+      });
+  };
+
   return (
     <div className="w-full min-w-96">
       <h3 className="border-b pb-2 text-md leading-normal tracking-tight">
@@ -113,18 +140,20 @@ export const EditWorkspaceDetails = ({
               )}
             />
 
-            <div className="">
-              <Button size="sm" disabled={isPending} type="submit">
-                {isPending ? (
-                  <span className="inline-flex items-center gap-1">
-                    <LoadingSpinner />
-                    Saving...
-                  </span>
-                ) : (
-                  "Save"
-                )}
-              </Button>
-            </div>
+            {form.formState.isDirty && (
+              <div className="">
+                <Button size="sm" disabled={isPending} type="submit">
+                  {isPending ? (
+                    <span className="inline-flex items-center gap-1">
+                      <LoadingSpinner />
+                      Saving...
+                    </span>
+                  ) : (
+                    "Save"
+                  )}
+                </Button>
+              </div>
+            )}
           </form>
         </Form>
 
@@ -146,31 +175,7 @@ export const EditWorkspaceDetails = ({
                 const file = e.target.files && e.target.files[0];
 
                 if (file) {
-                  const formData = new FormData();
-                  formData.append("logo", file);
-
-                  toast.info("Uploading logo...");
-                  await http
-                    .post(`/api/workspaces/${workspace.id}/upload`, formData, {
-                      headers: {
-                        "Content-Type": "multipart/form-data",
-                      },
-                    })
-                    .then((data) => {
-                      console.log(data);
-                      queryClient.invalidateQueries({
-                        queryKey: ["workspace", workspace.id],
-                      });
-                      toast.success("Updated workspace logo.");
-                    })
-                    .catch((error) => {
-                      if (axios.isAxiosError(error)) {
-                        return toast.error(error.response?.data.message);
-                      }
-
-                      console.error(error);
-                      throw error;
-                    });
+                  await handleFileUpload(file);
                 }
               }}
               id="logo"
