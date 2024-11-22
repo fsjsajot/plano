@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\Auth;
 
+use App\Events\WorkspaceCreated;
 use App\Http\Controllers\Controller;
 use App\Models\User;
 use Illuminate\Auth\Events\Registered;
@@ -33,12 +34,13 @@ class RegisteredUserController extends Controller
         ]);
 
         // insert default workspace
-        $user->workspaces()->create([
+       $workspace = $user->workspaces()->create([
             'name' => 'My Workspace',
             'user_id' => $user->id
         ]);
 
         event(new Registered($user));
+        WorkspaceCreated::dispatch($user, $workspace);
 
         Auth::login($user);
 
