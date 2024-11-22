@@ -26,6 +26,7 @@ export const WorkspaceSwitcher = () => {
 
     return navigate(`/app/${workspaceId}`);
   };
+  
   return (
     <Select
       onValueChange={handleSelect}

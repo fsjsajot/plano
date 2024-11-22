@@ -20,7 +20,9 @@ export const HomeContextProvder = ({
   children: React.ReactNode;
 }) => {
   const { workspaceId } = useParams();
-  const { data: workspaces, isLoading } = useWorkspaces();
+  const { data: workspaces, isLoading } = useWorkspaces({ includeAll: true, queryConfig: {
+    throwOnError: true
+  } });
   const [selectedWorkspace, setSelectedWorkspace] = useState<Workspace>();
 
   useEffect(() => {
