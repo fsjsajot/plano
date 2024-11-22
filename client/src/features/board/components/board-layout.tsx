@@ -16,7 +16,7 @@ export const BoardLayout = ({ children }: { children: React.ReactNode }) => {
 
   return (
     <div className="flex gap-4 w-full max-w-6xl mx-auto">
-      <div className="px-4 h-60 min-w-48 mt-8 sticky">
+      <div className="px-4 h-60 max-w-64 min-w-48 mt-8 sticky">
         <h1 className="font-bold text-sm">Boards</h1>
         <ScrollArea className="h-64 mt-2">
           {isBoardsLoading && (

@@ -45,16 +45,16 @@ export const CreatePost = () => {
 
   const { mutate, isPending } = useCreatePost({
     mutationConfig: {
-      onSuccess: () => {
-        queryClient.invalidateQueries({
-          queryKey: ["workspace_boards", Number(workspaceId), Number(boardId)],
-        });
-
-        form.reset();
+      onSuccess: async () => {
+        await queryClient.invalidateQueries({
+          queryKey: ["items", Number(workspaceId), Number(boardId)],
+          refetchType: "all",
+        }),
+          form.reset();
 
         toast.success("Created a new post");
 
-        navigate(`/app/${workspaceId}/boards/${boardId}`);
+        return navigate(`/app/${workspaceId}/boards/${boardId}`);
       },
 
       onError: (error) => {

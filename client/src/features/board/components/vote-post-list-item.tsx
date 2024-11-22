@@ -1,5 +1,5 @@
 import { CaretUp } from "@phosphor-icons/react";
-import { useQueryClient } from "@tanstack/react-query";
+import { InfiniteData, useQueryClient } from "@tanstack/react-query";
 import axios from "axios";
 import { useMemo } from "react";
 import { toast } from "sonner";
@@ -7,13 +7,15 @@ import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { useCastVote } from "@/features/post/api/cast-vote";
 import { useUncastVote } from "@/features/post/api/uncast-vote";
-import { Board, BoardItem, ItemVote } from "@/types/entities";
+import { BoardItem, ItemVote } from "@/types/entities";
+import { QueryBoardItems } from "../api/get-posts";
 
 interface VotePostProps {
   userId: number;
   workspaceId: number;
   boardId: number;
   itemId: number;
+  orderBy: string;
   item: BoardItem;
 }
 
@@ -22,6 +24,7 @@ export const VotePostListItem = ({
   boardId,
   itemId,
   workspaceId,
+  orderBy,
   item,
 }: VotePostProps) => {
   const queryClient = useQueryClient();
@@ -30,54 +33,63 @@ export const VotePostListItem = ({
     mutationConfig: {
       onMutate: async (variables) => {
         await queryClient.cancelQueries({
-          queryKey: [
-            "workspace_boards",
-            variables.workspaceId,
-            variables.boardId,
-          ],
+          queryKey: ["items"],
         });
 
-        let previousBoard = queryClient.getQueryData<Board>([
-          "workspace_boards",
+        let oldData = queryClient.getQueryData<InfiniteData<QueryBoardItems>>([
+          "items",
           variables.workspaceId,
           variables.boardId,
+          orderBy,
         ]);
 
-        if (previousBoard && previousBoard.items) {
-          const itemIndex = previousBoard.items.findIndex(
-            ({ id }) => id === variables.itemId
-          );
-          let item = previousBoard.items[itemIndex];
+        if (oldData) {
+          const newPages = oldData?.pages.map((page) => {
+            const data = page.data.map((item) => {
+              if (item.id === variables.itemId) {
+                // temporary vote object to make optimistic update to work
+                const voteObject: ItemVote = {
+                  id: Math.floor(Date.now() * Math.random()), // temporary id
+                  boardItemId: variables.itemId,
+                  userId: userId,
+                  createdAt: new Date().toISOString(),
+                  updatedAt: new Date().toISOString(),
+                };
 
-          if (!item) throw new Error("Item not found!");
+                return {
+                  ...item,
+                  votes: !!item.votes
+                    ? [...item.votes, voteObject]
+                    : [voteObject],
+                };
+              } else {
+                return item;
+              }
+            });
 
-          // temporary vote object to make optimistic update to work
-          const voteObject: ItemVote = {
-            id: Math.floor(Date.now() * Math.random()), // temporary id
-            boardItemId: variables.itemId,
-            userId: userId,
-            createdAt: new Date().toISOString(),
-            updatedAt: new Date().toISOString(),
+            return {
+              ...page,
+              data,
+            };
+          });
+
+          const newData = {
+            ...oldData,
+            pages: newPages,
           };
 
-          item.votes = !!item.votes
-            ? [...item.votes, voteObject]
-            : [voteObject];
-
-          previousBoard.items[itemIndex] = item;
+          queryClient.setQueryData<InfiniteData<QueryBoardItems>>(
+            ["items", variables.workspaceId, variables.boardId, orderBy],
+            newData
+          );
         }
 
-        queryClient.setQueryData(
-          ["workspace_boards", variables.workspaceId, variables.boardId],
-          previousBoard
-        );
-
-        return { previousBoard, variables };
+        return { oldData, variables };
       },
 
       onError: (error, _newVote, context) => {
         const ctx = context as {
-          previousBoard: Board;
+          oldData?: InfiniteData<QueryBoardItems>;
           variables: {
             workspaceId: number;
             boardId: number;
@@ -86,12 +98,8 @@ export const VotePostListItem = ({
         };
 
         queryClient.setQueryData(
-          [
-            "workspace_boards",
-            ctx.variables.workspaceId,
-            ctx.variables.boardId,
-          ],
-          ctx.previousBoard
+          ["items", ctx.variables.workspaceId, ctx.variables.boardId, orderBy],
+          ctx.oldData
         );
 
         if (axios.isAxiosError(error)) {
@@ -101,13 +109,9 @@ export const VotePostListItem = ({
         throw error;
       },
 
-      onSettled: (_data, _error, variables) => {
+      onSettled: (_data, _error, _variables) => {
         queryClient.invalidateQueries({
-          queryKey: [
-            "workspace_boards",
-            variables.workspaceId,
-            variables.boardId,
-          ],
+          queryKey: ["items"],
         });
       },
     },
@@ -117,43 +121,54 @@ export const VotePostListItem = ({
     mutationConfig: {
       onMutate: async (variables) => {
         await queryClient.cancelQueries({
-          queryKey: [
-            "workspace_boards",
-            variables.workspaceId,
-            variables.boardId,
-          ],
+          queryKey: ["items"],
         });
 
-        let previousBoard = queryClient.getQueryData<Board>([
-          "workspace_boards",
+        let oldData = queryClient.getQueryData<InfiniteData<QueryBoardItems>>([
+          "items",
           variables.workspaceId,
           variables.boardId,
+          orderBy,
         ]);
 
-        if (previousBoard && previousBoard.items) {
-          const itemIndex = previousBoard.items.findIndex(
-            ({ id }) => id === variables.itemId
-          );
-          let item = previousBoard.items[itemIndex];
+        if (oldData) {
+          const newPages = oldData?.pages.map((page) => {
+            const data = page.data.map((item) => {
+              if (item.id === variables.itemId) {
+                return {
+                  ...item,
+                  votes: item.votes.filter(
+                    (vote) => vote.id !== variables.voteId
+                  ),
+                };
+              } else {
+                return item;
+              }
+            });
 
-          if (!item) throw new Error("Item not found!");
+            return {
+              ...page,
+              data,
+            };
+          });
 
-          item.votes = item.votes.filter(
-            (vote) => vote.id !== variables.voteId
+          const newData = {
+            ...oldData,
+            pages: newPages,
+          };
+
+          queryClient.setQueryData<InfiniteData<QueryBoardItems>>(
+            ["items", variables.workspaceId, variables.boardId, orderBy],
+            newData
           );
         }
 
-        queryClient.setQueryData(
-          ["workspace_boards", variables.workspaceId, variables.boardId],
-          previousBoard
-        );
-
-        return { previousBoard, variables };
+        return { oldData, variables };
       },
 
       onError: (error, _newVote, context) => {
         const ctx = context as {
-          previousBoard: Board;
+          oldData: InfiniteData<QueryBoardItems>;
           variables: {
             workspaceId: number;
             boardId: number;
@@ -162,12 +177,8 @@ export const VotePostListItem = ({
         };
 
         queryClient.setQueryData(
-          [
-            "workspace_boards",
-            ctx.variables.workspaceId,
-            ctx.variables.boardId,
-          ],
-          ctx.previousBoard
+          ["items", ctx.variables.workspaceId, ctx.variables.boardId, orderBy],
+          ctx.oldData
         );
 
         if (axios.isAxiosError(error)) {
@@ -177,13 +188,9 @@ export const VotePostListItem = ({
         throw error;
       },
 
-      onSettled: (_data, _error, variables) => {
+      onSettled: (_data, _error, _variables) => {
         queryClient.invalidateQueries({
-          queryKey: [
-            "workspace_boards",
-            variables.workspaceId,
-            variables.boardId,
-          ],
+          queryKey: ["items"],
         });
       },
     },
