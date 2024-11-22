@@ -39,8 +39,6 @@ class BoardController extends Controller
      */
     public function show(Workspace $workspace, Board $board)
     {
-        $board->load(['boardItems.user']);
-        
         return new BoardResource($board);
     }
 
@@ -76,6 +74,12 @@ class BoardController extends Controller
     {
         if ($request->user()->cannot('delete', $workspace)) {
             abort(403);
+        }
+
+        $workspace->loadCount(['boards']);
+
+        if ($workspace->boards_count == 1) {
+            return response()->json(['data' => ['message' => 'There should be at least one board in a workspace.']], 400);
         }
 
         $board->delete();
