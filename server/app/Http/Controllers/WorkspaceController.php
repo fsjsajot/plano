@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Events\WorkspaceCreated;
 use App\Http\Resources\WorkspaceResource;
 use App\Models\Workspace;
 use Illuminate\Http\Request;
@@ -9,11 +10,17 @@ use Illuminate\Support\Facades\Auth;
 
 class WorkspaceController extends Controller
 {
-    public function index()
+    public function index(Request $request)
     {
         $authUser = Auth::user();
 
-        $workspaces = $authUser->workspaces;
+        $workspaces = [];
+        if ($request->query('include') == 'all') { // this will include workspaces that user was invited and joined to
+            $workspaces = $authUser->assignedWorkspaces;
+        } else {
+            $workspaces = Workspace::where('user_id', '=', $authUser->id)->orderBy('created_at')->get();
+        }
+
         return WorkspaceResource::collection($workspaces);
     }
 
@@ -40,6 +47,8 @@ class WorkspaceController extends Controller
         }
 
         $workspace = $user->workspaces()->create($params);
+
+        WorkspaceCreated::dispatch($user, $workspace);
 
         return new WorkspaceResource($workspace);
     }
