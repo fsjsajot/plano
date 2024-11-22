@@ -12,9 +12,24 @@ class StatusController extends Controller
     /**
      * Display a listing of the resource.
      */
-    public function index(Workspace $workspace)
+    public function index(Workspace $workspace, Request $request)
     {
-        $statuses = $workspace->statuses()->get();
+        $visible = $request->query('visible') ?? false;
+        $load_items = $request->query('load_items') ?? false;
+        $query = Status::where('workspace_id', '=', $workspace->id);
+       
+        if ($visible) {
+            $query->where('visibility', '=', $visible);
+        }
+
+        $statuses = $query->get();
+
+        if ($load_items) {
+            $statuses->load(['boardItems' => function ($query) {
+                $query->withCount(['item_votes'])->orderByDesc('item_votes_count');
+            }]);
+        }
+        
 
         return StatusResource::collection($statuses);
     }
