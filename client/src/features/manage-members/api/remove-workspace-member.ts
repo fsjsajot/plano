@@ -6,8 +6,8 @@ const removeWorkspaceMember = async ({
   workspaceId,
   memberId,
 }: {
-  workspaceId: string;
-  memberId: string;
+  workspaceId: number;
+  memberId: number;
 }) => {
   const response = await http.delete(
     `/api/workspaces/${workspaceId}/members/${memberId}`

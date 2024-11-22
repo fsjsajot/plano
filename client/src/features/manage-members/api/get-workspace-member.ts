@@ -4,8 +4,8 @@ import { queryOptions, useQuery } from "@tanstack/react-query";
 import { User } from "@/types/entities";
 
 export const getWorkspaceMember = async (
-  workspaceId: string,
-  memberId: string
+  workspaceId: number,
+  memberId: number
 ) => {
   const response = await http.get<User>(
     `/api/workspaces/${workspaceId}/members/${memberId}`
@@ -15,8 +15,8 @@ export const getWorkspaceMember = async (
 };
 
 export const getWorkspaceMemberOptions = (
-  workspaceId: string,
-  memberId: string
+  workspaceId: number,
+  memberId: number
 ) => {
   return queryOptions({
     queryKey: ["workspace_member", workspaceId, memberId],
@@ -25,8 +25,8 @@ export const getWorkspaceMemberOptions = (
 };
 
 type UseWorkspaceMemberOptions = {
-  workspaceId: string;
-  memberId: string;
+  workspaceId: number;
+  memberId: number;
   queryConfig?: QueryConfig<typeof getWorkspaceMemberOptions>;
 };
 

@@ -15,11 +15,19 @@ import { useWorkspaceMembers } from "../api/get-workspace-members";
 import { useRemoveWorkspaceMember } from "../api/remove-workspace-member";
 import { InviteMemberDialog } from "@/features/workspace-invite/components/invite-member-dialog";
 import { MemberItem } from "./member-item";
+import { useWorkspace } from "@/features/manage-workspace/api/get-workspace";
 
 export const ManageMembers = ({}) => {
   const [items, setItems] = useState<User[]>([]);
   const { workspaceId = "" } = useParams();
   const queryClient = useQueryClient();
+
+  const { data: workspace, isLoading: isWorkspaceLoading } = useWorkspace({
+    workspaceId: Number(workspaceId),
+    queryConfig: {
+      throwOnError: true,
+    },
+  });
 
   const { mutate: createInvite } = useCreateWorkspaceInvite({
     mutationConfig: {
@@ -95,8 +103,8 @@ export const ManageMembers = ({}) => {
     }
   };
 
-  const handleRemoveMember = async (memberId: string) => {
-    removeWorkspaceMember({ workspaceId, memberId });
+  const handleRemoveMember = async (memberId: number) => {
+    removeWorkspaceMember({ workspaceId: Number(workspaceId), memberId });
   };
 
   useEffect(() => {
@@ -114,7 +122,7 @@ export const ManageMembers = ({}) => {
     return [];
   }, [data]);
 
-  if (isLoading || isInviteLoading) {
+  if (isLoading || isInviteLoading || isWorkspaceLoading) {
     return (
       <div className="flex h-full w-full items-center justify-center">
         <LoadingSpinner className="w-10 h-10" />
@@ -178,6 +186,7 @@ export const ManageMembers = ({}) => {
             <MemberItem
               key={user.id}
               user={user}
+              workspace={workspace!}
               handleRemoveMember={() => handleRemoveMember(user.id)}
             />
           ))}
