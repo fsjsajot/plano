@@ -6,6 +6,7 @@ use App\Http\Controllers\BoardItemFileController;
 use App\Http\Controllers\ItemCommentController;
 use App\Http\Controllers\ItemVoteController;
 use App\Http\Controllers\StatusController;
+use App\Http\Controllers\UserAvatarUploadController;
 use App\Http\Controllers\UserController;
 use App\Http\Controllers\WorkspaceController;
 use App\Http\Controllers\WorkspaceInviteController;
@@ -23,9 +24,13 @@ Route::apiResource('workspaces.boards.items.files', BoardItemFileController::cla
 // invite by email
 Route::get('workspaces/{workspace}/invited/{token}', [WorkspaceInviteController::class, 'acceptEmailInvite'])->middleware(['auth:sanctum']);
 
-Route::middleware(['auth:sanctum'])->get('/user', [UserController::class, "show"])->name("current.user");
+Route::middleware(['auth:sanctum', 'user_status_check'])->get('/user', [UserController::class, "show"])->name("current.user");
 
-Route::middleware(['auth:sanctum'])->group(function () {
+Route::middleware(['auth:sanctum', 'user_status_check'])->group(function () {
+    Route::patch("/user/profile", [UserController::class, 'update_profile']);
+    Route::patch("/user/password", [UserController::class, 'update_password']);
+    Route::post("/user/profile/upload", UserAvatarUploadController::class);
+
     Route::apiResource('workspaces', WorkspaceController::class);
     Route::apiResource('workspaces.statuses', StatusController::class);
     Route::apiResource('workspaces.boards', BoardController::class);
@@ -36,6 +41,6 @@ Route::middleware(['auth:sanctum'])->group(function () {
 
     Route::get('workspaces/{workspace}/members/{memberId}', [WorkspaceMemberController::class, 'show']);
     Route::apiResource('workspaces.members', WorkspaceMemberController::class)->only(['index', 'destroy']);
-    
+
     Route::post('workspaces/{workspace}/upload', WorkspaceLogoUploadController::class);
 });
