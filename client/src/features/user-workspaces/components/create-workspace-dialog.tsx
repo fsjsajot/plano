@@ -10,6 +10,7 @@ import { Button } from "@/components/ui/button";
 import {
   Dialog,
   DialogContent,
+  DialogDescription,
   DialogHeader,
   DialogTitle,
   DialogTrigger,
@@ -77,6 +78,7 @@ export const CreateWorkspaceDialog = () => {
       <DialogContent className="sm:max-w-[425px]">
         <DialogHeader>
           <DialogTitle>Create workspace</DialogTitle>
+          <DialogDescription className="sr-only">Dialog for creating new workspaces.</DialogDescription>
         </DialogHeader>
         <Form {...form}>
           <form
