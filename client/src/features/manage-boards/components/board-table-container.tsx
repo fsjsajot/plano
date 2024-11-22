@@ -12,7 +12,10 @@ interface BoardTableContainerProps {
 export const BoardTableContainer = ({ items }: BoardTableContainerProps) => {
   const [rowAction, setRowAction] = useState<BoardRowAction>();
 
-  const columns = useMemo(() => tableColumns(setRowAction), []);
+  const columns = useMemo(
+    () => tableColumns(setRowAction, items.length > 1),
+    [items]
+  );
 
   return (
     <BoardTable

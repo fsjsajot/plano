@@ -23,7 +23,8 @@ const formatter = new Intl.DateTimeFormat("en-US", {
 });
 
 export const columns = (
-  setRowAction: (action: BoardRowAction) => void
+  setRowAction: (action: BoardRowAction) => void,
+  allowDelete?: boolean
 ): ColumnDef<Board>[] => {
   return [
     {
@@ -135,17 +136,19 @@ export const columns = (
                 <Pencil className="mr-2" />
                 Edit
               </DropdownMenuItem>
-              <DropdownMenuItem
-                onClick={() =>
-                  setRowAction({
-                    type: "delete",
-                    data: row.original,
-                  })
-                }
-              >
-                <Trash className="mr-2" />
-                Delete
-              </DropdownMenuItem>
+              {allowDelete && (
+                <DropdownMenuItem
+                  onClick={() =>
+                    setRowAction({
+                      type: "delete",
+                      data: row.original,
+                    })
+                  }
+                >
+                  <Trash className="mr-2" />
+                  Delete
+                </DropdownMenuItem>
+              )}
             </DropdownMenuContent>
           </DropdownMenu>
         );

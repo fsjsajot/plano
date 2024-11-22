@@ -42,7 +42,7 @@ export const DeleteBoardDialog = ({
         console.error(error);
 
         if (axios.isAxiosError(error)) {
-          return toast.error(error.response?.data.message);
+          return toast.error(error.response?.data?.data?.message);
         }
 
         throw error;
