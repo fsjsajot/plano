@@ -1,5 +1,5 @@
 import { Pencil, Trash } from "@phosphor-icons/react";
-import { useState } from "react";
+import { Fragment, useState } from "react";
 import { useParams } from "react-router-dom";
 
 import { HomeLayout } from "@/components/layout/home-layout";
@@ -74,39 +74,44 @@ export const Post = () => {
             />
           )}
 
-          {user && user.id === item.author.id && (
-            <div className="my-4 flex items-center gap-2 border-b py-2 border-dashed">
-              <a
-                href={`/app/${workspaceId}/boards/${boardId}/posts/${itemId}/edit`}
-                className={buttonVariants({ size: "sm", variant: "ghost" })}
-              >
-                <Pencil weight="light" className="mr-2" />
-                Edit post
-              </a>
+          <div className="my-4 flex items-center gap-2 border-b py-2 border-dashed">
+            {user && user.id === item.author.id && (
+              <Fragment>
+                <a
+                  href={`/app/${workspaceId}/boards/${boardId}/posts/${itemId}/edit`}
+                  className={buttonVariants({ size: "sm", variant: "ghost" })}
+                >
+                  <Pencil weight="light" className="mr-2" />
+                  Edit post
+                </a>
 
-              <Button
-                onClick={() => setOpenDialog(true)}
-                variant="ghost"
-                size="sm"
-                className="text-red-500 hover:text-red-600"
-              >
-                <Trash weight="light" className="mr-2" />
-                Delete post
-              </Button>
+                <Button
+                  onClick={() => setOpenDialog(true)}
+                  variant="ghost"
+                  size="sm"
+                  className="text-red-500 hover:text-red-600"
+                >
+                  <Trash weight="light" className="mr-2" />
+                  Delete post
+                </Button>
+              </Fragment>
+            )}
+            <div className="flex flex-1 justify-end gap-4">
+              <p className="text-sm">
+                <span className="font-semibold mr-1">Status:</span>
+                {item.status && item.status.name}
+              </p>
+              <p className="text-sm">
+                <span className="font-semibold mr-1">Posted on:</span>
+                {new Intl.DateTimeFormat().format(new Date(item.createdAt))}
+              </p>
 
-              <div className="flex flex-1 justify-end gap-4">
-                <p className="text-sm">
-                  <span className="font-semibold mr-1">Posted on:</span>
-                  {new Intl.DateTimeFormat().format(new Date(item.createdAt))}
-                </p>
-
-                <p className="text-sm">
-                  <span className="font-semibold mr-1">Posted by:</span>
-                  {item.author.name}
-                </p>
-              </div>
+              <p className="text-sm">
+                <span className="font-semibold mr-1">Posted by:</span>
+                {item.author.name}
+              </p>
             </div>
-          )}
+          </div>
         </div>
 
         <CommentSection

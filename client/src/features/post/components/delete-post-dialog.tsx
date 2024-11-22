@@ -35,14 +35,11 @@ export const DeletePostDialog = ({
   const navigate = useNavigate();
   const { mutate, isPending } = useDeletePost({
     mutationConfig: {
-      onSuccess: () => {
-        queryClient.invalidateQueries({
-          queryKey: ["item", Number(itemId)],
-        });
-
-        queryClient.invalidateQueries({
-          queryKey: ["workspace_boards", workspaceId, boardId],
-        });
+      onSuccess: async () => {
+        await queryClient.invalidateQueries({
+          queryKey: ["items", Number(workspaceId), Number(boardId)],
+          refetchType: "all",
+        }),
         onOpenChange();
 
         navigate(`/app/${workspaceId}/boards/${boardId}`);
