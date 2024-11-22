@@ -11,7 +11,7 @@ export const getWorkspace = async (workspaceId: number) => {
 
 export const getWorkspaceOptions = (workspaceId: number) => {
   return queryOptions({
-    queryKey: ["workspaces", workspaceId],
+    queryKey: ["workspace", workspaceId],
     queryFn: () => getWorkspace(workspaceId),
     staleTime: Infinity,
   });
