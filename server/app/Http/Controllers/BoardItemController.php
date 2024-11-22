@@ -14,10 +14,57 @@ class BoardItemController extends Controller
     /**
      * Display a listing of the resource.
      */
-    public function index(Workspace $workspace, Board $board)
+    public function index(Workspace $workspace, Board $board, Request $request)
     {
-        $boardItems = $board->boardItems;
-        return BoardItemResource::collection($boardItems);
+        $order_by = $request->query('order_by');
+        $search_term = $request->query('query');
+        $display = $request->query('display') ?? false;
+        $status = $request->query('status');
+
+        $boardItems = null;
+        $items = [];
+
+        // for home display 
+        if ($display) {
+            $boardItems = BoardItem::with(['board'])->where('board_id', '=', $board->id);
+
+            if ($status && is_array($status)) {
+                $boardItems->whereIn('status_id', $status);
+            }
+
+            $items = $boardItems->get();
+
+            $items->groupBy(['status_id']);
+            return BoardItemResource::collection($items);
+        }
+
+        // for board screens
+        $boardItems = BoardItem::withCount(['item_votes'])->with(['user', 'item_votes'])->where('board_id', '=', $board->id);
+
+        if ($search_term) {
+            $boardItems->whereLike('title', "%{$search_term}%");
+        }
+
+        if (!$order_by) {
+            $boardItems->orderByDesc('created_at');
+        }
+
+        if ($order_by) {
+            if ($order_by == 'newest') {
+                $boardItems->orderByDesc('created_at');
+            }
+
+            if ($order_by == 'oldest') {
+                $boardItems->orderBy('created_at');
+            }
+
+            if ($order_by == 'top') {
+                $boardItems->orderByDesc('item_votes_count');
+            }
+        }
+
+        $items = $boardItems->cursorPaginate(10);
+        return BoardItemResource::collection($items);
     }
 
     /**
@@ -43,7 +90,7 @@ class BoardItemController extends Controller
      */
     public function show(Workspace $workspace, Board $board, BoardItem $item)
     {
-        $item->load(['user', 'itemVotes']);
+        $item->load(['user', 'item_votes', 'status']);
 
         return new BoardItemResource($item);
     }
