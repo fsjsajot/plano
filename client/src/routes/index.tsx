@@ -11,6 +11,7 @@ import { Post } from "@/features/post/components/post";
 import { WorkspaceInvite } from "@/features/workspace-invite/components/workspace-invite";
 import { appRoutes } from "./app";
 import { authRoutes } from "./auth";
+import { AccountSettings } from "@/features/account-settings/components/account-settings";
 
 export const routes: RouteObject[] = [
   {
@@ -18,9 +19,10 @@ export const routes: RouteObject[] = [
     path: "/",
     errorElement: <AppErrorBoundary />,
     children: [
+      
+      authRoutes,
       {
         path: "",
-        index: true,
         element: <RootLayout />,
       },
 
@@ -58,13 +60,17 @@ export const routes: RouteObject[] = [
         ],
       },
 
-      authRoutes,
-      ...appRoutes,
-
       {
         path: "/invite/:workspaceId/:token",
         element: <WorkspaceInvite />,
       },
+
+      {
+        path: "/account_settings",
+        element: <AccountSettings />,
+      },
+
+      ...appRoutes,
     ],
   },
 ];
